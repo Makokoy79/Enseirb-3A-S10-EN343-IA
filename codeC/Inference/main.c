@@ -20,6 +20,7 @@ Pour exécuter, tapez : ./all
 
 
 int main(int argc, char* argv[]){
+<<<<<<< HEAD
 
    BMP bitmap;
    FILE* pFichier=NULL;
@@ -101,6 +102,13 @@ int main(int argc, char* argv[]){
 
 
    DesallouerBMP(&bitmap);
+=======
+
+    // Couche_t couche;
+    // import_couche(&couche, 0);
+    // printf("\n");
+    // import_couche(&couche, 1);
+>>>>>>> 914c60ac390de7966ddb1f2d41aae256af15da69
 
   return 0;
 }
