@@ -13,12 +13,22 @@ Pour exécuter, tapez : /
 
 typedef struct
 {
-    int couche;
-    int weights[];
-    int biais[];
+    int nb_weights;
+    int nb_bias;
+    int* weights;
+    int* bias;
+} Couche_t;
+
+
+typedef struct
+{
+    int nb_couche;
+    Couche_t* couches;
 } Model_t;
 
-void Conv2D(int nb_filters, int kernel_size[2], char function_activation[], Model_t model);
-void MaxPooling2D(int pool_size[2], Model_t model);
+
+
+void Conv2D(int nb_filters, int kernel_size[2], char function_activation[], Couche_t couche);
+void MaxPooling2D(int pool_size[2], Couche_t couche);
 
 #endif
