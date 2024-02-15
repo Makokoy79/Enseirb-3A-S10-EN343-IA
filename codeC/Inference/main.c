@@ -17,22 +17,90 @@ Pour exécuter, tapez : ./all
 #include "Bmp2Matrix.h"
 #include "couche.h"
 
+
+
 int main(int argc, char* argv[]){
-  int kernel_size[2] = {3, 3};
-  int pool_size[2] = {2, 2};
 
-  printf("Couche 2\n");
-  Conv2D(32, kernel_size, "relu");
+   BMP bitmap;
+   FILE* pFichier=NULL;
 
-  printf("Couche 3\n");
-  MaxPooling2D(pool_size);
+   pFichier=fopen("0_1.bmp", "rb");     //Ouverture du fichier contenant l'image
+   if (pFichier==NULL) {
+       printf("%s\n", "0_1.bmp");
+       printf("Erreur dans la lecture du fichier\n");
+   }
+   LireBitmap(pFichier, &bitmap);
+   fclose(pFichier);               //Fermeture du fichier contenant l'image
 
-  printf("Couche 4\n");
-  Conv2D(64, kernel_size, "softmax");
+   ConvertRGB2Gray(&bitmap);
 
-  printf("Couche 5\n");
-  MaxPooling2D(pool_size);
+/*         keras.Input(shape=input_shape),
+        layers.Conv2D(32, kernel_size=(3, 3), activation="relu"),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Conv2D(64, kernel_size=(3, 3), activation="relu"),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Flatten(),
+        layers.Dense(test_nb, activation="softmax"), */
 
+  Model_t Neural_net;
+
+  //Convolution 2D
+  Conv2D_t Conv2D_1;
+  Conv2D_1.nb = 32;
+  Conv2D_1.kernel_size[0] = 3;
+  Conv2D_1.kernel_size[1] = 3;
+  Conv2D_1.activation = 'r';
+
+/* Allocation mémoire*/
+
+    // Alloue de la mémoire pour x neurones de la couche
+    float*** Conv2D_1_datas = malloc(Conv2D_1.nb * sizeof(float**));
+    if (Conv2D_1_datas == NULL) {
+        perror("Allocation de mémoire a échoué");
+        exit(EXIT_FAILURE);
+    }
+
+    // Alloue de la mémoire pour chaque espace de 26x26 float (taille de la sortie)
+    for (int i = 0; i < Conv2D_1.nb; i++) {
+        Conv2D_1_datas[i] = malloc(bitmap.infoHeader.xResolution * sizeof(float*)); // Allouer un tableau de 26 pointeurs vers float
+        if (Conv2D_1_datas[i] == NULL) {
+            perror("Allocation de mémoire a échoué");
+            exit(EXIT_FAILURE);
+        }
+        for (int j = 0; j < 26; j++) {
+            Conv2D_1_datas[i][j] = malloc(bitmap.infoHeader.xResolution * sizeof(float)); // Allouer un tableau de 26 float
+            if (Conv2D_1_datas[i][j] == NULL) {
+                perror("Allocation de mémoire a échoué");
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
+
+  Conv2D(&bitmap, &Conv2D_1, &Neural_net.couche[0]);
+    //TODO
+
+  //Max_pooling
+    //TODO
+
+  // Libérer la mémoire des données d'entrée de la fonction précédente
+      for (int i = 0; i < Conv2D_1.nb; i++) {
+        for (int j = 0; j < bitmap.infoHeader.xResolution; j++) {
+            free(Conv2D_1_datas[i][j]);
+        }
+        free(Conv2D_1_datas[i]);
+    }
+    free(Conv2D_1_datas);
+  //Convolution 2D
+    //TODO
+
+  //Max_pooling
+    //TODO
+
+  // Flatten
+    // TODO
+
+
+   DesallouerBMP(&bitmap);
 
   return 0;
 }
