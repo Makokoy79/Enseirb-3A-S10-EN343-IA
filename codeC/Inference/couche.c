@@ -13,12 +13,12 @@ Pour exécuter, tapez : /
 
 #include "couche.h"
 
-void Conv2D(int nb_filters, int kernel_size[2], char function_activation[]) {
+void Conv2D(int nb_filters, int kernel_size[2], char function_activation[], Model_t model) {
     printf("Conv2D: Number of filters: %d, Kernel size: [%d, %d], Activation function: %s\n",
            nb_filters, kernel_size[0], kernel_size[1], function_activation);
 }
 
-void MaxPooling2D(int pool_size[2]) {
+void MaxPooling2D(int pool_size[2], Model_t model) {
     printf("MaxPooling2D: Pool size: [%d, %d]\n",
            pool_size[0], pool_size[1]);
 }
