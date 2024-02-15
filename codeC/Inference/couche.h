@@ -11,12 +11,18 @@ Pour exécuter, tapez : /
 #ifndef COUCHE_H
 #define COUCHE_H
 
+#define PARAM_FOLDER "../Parametres/"
+#define FILE_COUCHE "couche"
+#define FILE_BIAS "biais"
+#define FILE_WEIGHTS "poids"
+#define FILE_EXTENSION ".txt"
+
 typedef struct
 {
     int nb_weights;
     int nb_bias;
-    int* weights;
-    int* bias;
+    double* weights;
+    double* bias;
 } Couche_t;
 
 
@@ -26,7 +32,10 @@ typedef struct
     Couche_t* couches;
 } Model_t;
 
-
+int calcul_nb_ligne(FILE *file);
+void read_file(FILE *file, int nb_lines, int* texte);
+void import_couche(Couche_t* couche, int i);
+void import_model(Model_t model);
 
 void Conv2D(int nb_filters, int kernel_size[2], char function_activation[], Couche_t couche);
 void MaxPooling2D(int pool_size[2], Couche_t couche);
