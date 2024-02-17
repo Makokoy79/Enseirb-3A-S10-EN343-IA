@@ -26,9 +26,17 @@ int main(int argc, char* argv[]){
     // import_couche(&couche, 1);
 
     Model_t model;
-    model.nb_couche = 3;
+    model.nb_couche = 6;
+    model.couches = (Couche_t *)malloc(model.nb_couche * sizeof(Couche_t));
 
     import_model(&model);
+
+
+    for (int i = 0; i < model.nb_couche; i++) {
+        free(model.couches[i].weights);
+        free(model.couches[i].bias);
+    }
+    free(model.couches);
 
   return 0;
 }

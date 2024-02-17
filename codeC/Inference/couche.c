@@ -178,7 +178,7 @@ void import_model(Model_t* model) {
 
     for (int i = 0; i < model->nb_couche; i++)
     {
-        import_couche(&model->couches, i);
+        import_couche(&model->couches[i], i);
         // printf("\n");
         // printf("Weights\n");
         // print_float_matrix(model->couches->weights, model->couches->nb_weights);
