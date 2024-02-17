@@ -20,9 +20,15 @@ Pour exécuter, tapez : ./all
 int main(int argc, char* argv[]){
 
     // Couche_t couche;
+
     // import_couche(&couche, 0);
     // printf("\n");
     // import_couche(&couche, 1);
+
+    Model_t model;
+    model.nb_couche = 3;
+
+    import_model(&model);
 
   return 0;
 }

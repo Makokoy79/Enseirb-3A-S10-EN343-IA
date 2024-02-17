@@ -14,6 +14,18 @@ Pour exécuter, tapez : /
 
 #include "couche.h"
 
+void print_float_matrix(float* matrix, int taille) {
+    for (int i = 0; i < taille; i++) {
+        printf("%f\t", matrix[i]);
+
+        // Revenir à la ligne tous les 5 éléments
+        if ((i + 1) % 5 == 0) {
+            printf("\n");
+        }
+    }
+    printf("\n");
+}
+
 int calcul_nb_ligne(FILE *file) {
     int nb_lines = 0;
     char ch;
@@ -32,7 +44,7 @@ int calcul_nb_ligne(FILE *file) {
     return nb_lines;
 }
 
-void read_file(FILE *file, int nb_lines, int* texte) {
+void read_file(FILE *file, int nb_lines, float* texte) {
     if (file == NULL) {
         perror("Erreur d'ouverture du fichier");
         return;
@@ -42,18 +54,15 @@ void read_file(FILE *file, int nb_lines, int* texte) {
 
     for (int i = 0; i < nb_lines; i++) {
         if (fgets(buffer, sizeof(buffer), file) != NULL) {
-            printf("ALigne %d : %s\n", i + 1, buffer);
-            // printf("atof('4')=%f\n",atof("4"));
-            printf("atoi(buffer)=%f\n",atof(buffer));
+            // printf("Texte %d : %s\n", i + 1, buffer);
             texte[i] = atof(buffer);
-            printf("BLigne %d : %d\n", i + 1, texte[i]);
+            // printf("Couche %d : %10f\n", i + 1, texte[i]);
         } else {
             printf("Erreur de lecture de la ligne %d\n", i + 1);
             exit(EXIT_FAILURE);
         }
     }
 }
-
 
 void import_couche(Couche_t* couche, int i) {
     FILE *weights_file;
@@ -83,7 +92,7 @@ void import_couche(Couche_t* couche, int i) {
     strcat(weights_filename, FILE_COUCHE);
     strcat(weights_filename, num_couche);
     strcat(weights_filename, "-");
-    strcat(weights_filename, FILE_BIAS);
+    strcat(weights_filename, FILE_WEIGHTS);
     strcat(weights_filename, FILE_EXTENSION);
     printf("Filename: %s\n", weights_filename);
 
@@ -91,7 +100,7 @@ void import_couche(Couche_t* couche, int i) {
     strcat(bias_filename, FILE_COUCHE);
     strcat(bias_filename, num_couche);
     strcat(bias_filename, "-");
-    strcat(bias_filename, FILE_WEIGHTS);
+    strcat(bias_filename, FILE_BIAS);
     strcat(bias_filename, FILE_EXTENSION);
     printf("Filename: %s\n", bias_filename);
 
@@ -116,10 +125,15 @@ void import_couche(Couche_t* couche, int i) {
     else
     {
         printf("Number of weights in couche %d\n", nb_lines);
-        couche->nb_bias = nb_lines;
+        couche->nb_weights = nb_lines;
     }
 
-    read_file(weights_file, nb_lines, couche->weights);
+    couche->weights = (float *)malloc(couche->nb_weights * sizeof(float));
+
+    read_file(weights_file, couche->nb_weights, couche->weights);
+
+    // printf("Matrix of weights:\n");
+    // print_float_matrix(couche->weights, couche->nb_weights);
 
     /********** Bias **********/
     bias_file = fopen(bias_filename, "r");
@@ -142,7 +156,12 @@ void import_couche(Couche_t* couche, int i) {
         couche->nb_bias = nb_lines;
     }
 
-    read_file(bias_file, nb_lines, couche->bias);
+    couche->bias = (float *)malloc(couche->nb_bias * sizeof(float));
+    
+    read_file(bias_file, couche->nb_bias, couche->bias);
+
+    // printf("Matrix of bias:\n");
+    // print_float_matrix(couche->bias, couche->nb_bias);
     
     free(weights_filename);
     free(bias_filename);
@@ -151,12 +170,24 @@ void import_couche(Couche_t* couche, int i) {
     fclose(bias_file);
 }
 
-
-void import_model(Model_t model) {
+void import_model(Model_t* model) {
     // lire des fichiers
         // lire un fichier
             // calculer le nombre de lignes
             // stocker les lignes dans un tableau
+
+    for (int i = 0; i < model->nb_couche; i++)
+    {
+        import_couche(&model->couches, i);
+        // printf("\n");
+        // printf("Weights\n");
+        // print_float_matrix(model->couches->weights, model->couches->nb_weights);
+        // printf("\n");
+        // printf("Bias\n");
+        // print_float_matrix(model->couches->bias, model->couches->nb_bias);
+        printf("\n\n");
+    }
+    
 }
 
 void Conv2D(int nb_filters, int kernel_size[2], char function_activation[], Couche_t couche) {
