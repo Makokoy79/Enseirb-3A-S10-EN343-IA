@@ -23,18 +23,12 @@ int main(int argc, char* argv[]){
 
   /********** Import of the model with weights and biais **********/
 
-  Model_t model;
-  model.nb_couche = 7;
-  model.couches = (Couche_t *)malloc(model.nb_couche * sizeof(Couche_t));
+  Model_t Neural_net;
+  Neural_net.nb_couche = 7;
+  Neural_net.couches = (Couche_t *)malloc(Neural_net.nb_couche * sizeof(Couche_t));
 
-  import_model(&model);
+  import_model(&Neural_net);
 
-
-  for (int i = 0; i < model.nb_couche; i++) {
-      free(model.couches[i].weights);
-      free(model.couches[i].bias);
-  }
-  free(model.couches);
 
   /********** Calcul  **********/
 
@@ -51,15 +45,13 @@ int main(int argc, char* argv[]){
 
   ConvertRGB2Gray(&bitmap);
 
-/*         keras.Input(shape=input_shape),
+/*      keras.Input(shape=input_shape),
         layers.Conv2D(32, kernel_size=(3, 3), activation="relu"),
         layers.MaxPooling2D(pool_size=(2, 2)),
         layers.Conv2D(64, kernel_size=(3, 3), activation="relu"),
         layers.MaxPooling2D(pool_size=(2, 2)),
         layers.Flatten(),
         layers.Dense(test_nb, activation="softmax"), */
-
-  Model_t Neural_net;
 
   //Convolution 2D
   Conv2D_t Conv2D_1;
@@ -93,7 +85,7 @@ int main(int argc, char* argv[]){
         }
     }
 
-  Conv2D(&bitmap, &Conv2D_1, &Neural_net.couche[0]);
+  Conv2D(&bitmap, &Conv2D_1, &Neural_net.couches[0]);
     //TODO
 
   //Max_pooling
@@ -121,11 +113,11 @@ int main(int argc, char* argv[]){
   /********** All free **********/
 
   // Free couche
-  for (int i = 0; i < model.nb_couche; i++) {
-      free(model.couches[i].weights);
-      free(model.couches[i].bias);
+  for (int i = 0; i < Neural_net.nb_couche; i++) {
+      free(Neural_net.couches[i].weights);
+      free(Neural_net.couches[i].bias);
   }
-  free(model.couches);
+  free(Neural_net.couches);
   
   DesallouerBMP(&bitmap);
 

@@ -56,7 +56,7 @@ void read_file(FILE *file, int nb_lines, float* texte) {
         if (fgets(buffer, sizeof(buffer), file) != NULL) {
             // printf("Texte %d : %s\n", i + 1, buffer);
             texte[i] = atof(buffer);
-            // printf("Couche %d : %10f\n", i + 1, texte[i]);
+            // printf("Couche %d : %.20f\n", i + 1, texte[i]);
         } else {
             printf("Erreur de lecture de la ligne %d\n", i + 1);
             exit(EXIT_FAILURE);
@@ -176,7 +176,7 @@ void import_model(Model_t* model) {
             // calculer le nombre de lignes
             // stocker les lignes dans un tableau
 
-    for (int i = 0; i < model->nb_couche; i++)
+    for (int i = 1; i < model->nb_couche; i++)
     {
         import_couche(&model->couches[i], i);
         // printf("\n");
