@@ -84,7 +84,15 @@ int main(int argc, char* argv[]){
         }
     }
 
+  /* Couche 1 */
   Conv2D(&bitmap, &Conv2D_1, &Neural_net.couches[0]);
+
+  /* Debug couche 1 */
+  printf("Debug couche 1 : Conv2D(32, kernel_size=(3, 3), activation=relu)\n");
+  debug_couche1(&bitmap, &Conv2D_1, &Neural_net.couches[0]);
+
+
+
     //TODO
 
   //Max_pooling
@@ -111,7 +119,7 @@ int main(int argc, char* argv[]){
   
   /********** All free **********/
 
-  // Free couche
+  // Free model and couche
   for (int i = 0; i < Neural_net.nb_couche; i++) {
       free(Neural_net.couches[i].weights);
       free(Neural_net.couches[i].bias);

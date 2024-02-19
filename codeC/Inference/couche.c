@@ -225,3 +225,41 @@ void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche) {
 //     //          faire une conv_unit(x_pixels)
 //     sizeofoutput = entree-filtre+1
 // }
+
+
+void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche) {
+    FILE *inter_file;
+
+    int nb_lines = 0;
+
+    inter_file = fopen("../Parametres/inter1.txt", "r");
+
+    if (inter_file == NULL) {
+        perror("Erreur d'ouverture du fichier");
+        return;
+    }
+
+    nb_lines = calcul_nb_ligne(inter_file);
+
+    if (nb_lines == 0) {
+        printf("Void file %d\n");
+        return;
+    }
+    else
+    {
+        printf("Number of lines : %d\n", nb_lines);
+    }
+
+    double* inter_value = (double *)malloc(couche->nb_weights * sizeof(double));
+
+    read_file(inter_file, nb_lines, inter_value);
+
+    printf("Matrix of inter value:\n");
+    print_float_matrix(nb_lines, inter_value);
+
+    Conv2D(pBitmap, Conv2D_shape, couche);
+
+    // Check();
+
+    fclose(inter_file);
+}

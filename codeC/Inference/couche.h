@@ -63,4 +63,9 @@ float conv_unit(float *pixels, int nb_pixels, float weight, float bias);
 void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche);
 void MaxPooling2D(int pool_size[2], Couche_t couche);
 
+
+void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche);
+
+
+
 #endif
