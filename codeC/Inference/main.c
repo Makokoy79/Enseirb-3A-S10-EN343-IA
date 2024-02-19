@@ -29,9 +29,6 @@ int main(int argc, char* argv[]){
 
   import_model(&Neural_net);
 
-
-  
-
   /********** Rémy : Calcul  **********/
 
   BMP bitmap;
@@ -47,7 +44,7 @@ int main(int argc, char* argv[]){
 
   ConvertRGB2Gray(&bitmap);
 
-/*         keras.Input(shape=input_shape),
+/*      keras.Input(shape=input_shape),
         layers.Conv2D(32, kernel_size=(3, 3), activation="relu"),
         layers.MaxPooling2D(pool_size=(2, 2)),
         layers.Conv2D(64, kernel_size=(3, 3), activation="relu"),
@@ -75,7 +72,16 @@ int main(int argc, char* argv[]){
   // printf("Taille de l'image chargée en x : [%d]\n", bitmap.infoHeader.largeur);
 
 
+  
+  /* Couche 1 */
   Conv2D(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
+
+  /* Debug couche 1 */
+  printf("Debug couche 1 : Conv2D(32, kernel_size=(3, 3), activation=relu)\n");
+  debug_couche1(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
+
+
+
     //TODO
 
   //Max_pooling
@@ -102,13 +108,19 @@ int main(int argc, char* argv[]){
     // TODO
 
 
+  
+  /********** All free **********/
+
+  // Free model and couche
+  for (int i = 0; i < Neural_net.nb_couche; i++) {
+      free(Neural_net.couches[i].weights);
+      free(Neural_net.couches[i].bias);
+  }
+  free(Neural_net.couches);
+  
   DesallouerBMP(&bitmap);
 
-   for (int i = 0; i < Neural_net.nb_couche; i++) {
-     free(Neural_net.couches[i].weights);
-     free(Neural_net.couches[i].bias);
-   }
-   free(Neural_net.couches);
+
 
 
   return 0;
