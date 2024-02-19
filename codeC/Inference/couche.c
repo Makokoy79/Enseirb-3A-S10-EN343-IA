@@ -176,9 +176,9 @@ void import_model(Model_t* model) {
             // calculer le nombre de lignes
             // stocker les lignes dans un tableau
 
-    for (int i = 1; i < model->nb_couche; i++)
+    for (int i = 0; i < model->nb_couche; i++)
     {
-        import_couche(&model->couches[i], i);
+        import_couche(&model->couches[i], i+1);
         // printf("\n");
         // printf("Weights\n");
         // print_float_matrix(model->couches->weights, model->couches->nb_weights);

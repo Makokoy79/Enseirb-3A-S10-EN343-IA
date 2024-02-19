@@ -24,11 +24,10 @@ int main(int argc, char* argv[]){
   /********** Import of the model with weights and biais **********/
 
   Model_t Neural_net;
-  Neural_net.nb_couche = 7;
+  Neural_net.nb_couche = 6;
   Neural_net.couches = (Couche_t *)malloc(Neural_net.nb_couche * sizeof(Couche_t));
 
   import_model(&Neural_net);
-
 
   /********** Calcul  **********/
 
