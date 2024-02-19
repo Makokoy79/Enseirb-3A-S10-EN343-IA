@@ -60,7 +60,7 @@ void import_model(Model_t* model);
 
 float conv_unit(float *pixels, int nb_pixels, float weight, float bias);
 
-void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche);
+void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, float*** Conv2D_1_datas);
 void MaxPooling2D(int pool_size[2], Couche_t couche);
 
 #endif

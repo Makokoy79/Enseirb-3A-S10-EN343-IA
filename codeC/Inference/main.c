@@ -93,7 +93,7 @@ int main(int argc, char* argv[]){
         }
     }
 
-  Conv2D(&bitmap, &Conv2D_1, &Neural_net.couche[0]);
+  Conv2D(&bitmap, &Conv2D_1, &Neural_net.couches[0], &Conv2D_1_datas);
     //TODO
 
   //Max_pooling

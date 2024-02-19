@@ -202,26 +202,26 @@ float conv_unit(float *pixels, int nb_pixels, float weight, float bias)
     return (conv)/nb_pixels+bias; // Biais du neurone
 }
 
-void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche) {
+void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, float*** Conv2D_1_datas) {
+    //Pour chaque neurone à traiter
     for (int neuron = 0; neuron<Conv2D_shape->nb; neuron++)
     {
-        //for 
+        // Pour chaque ligne de la donnée d'entrée
+        for (int line = 0; line<(pBitmap->infoHeader.xResolution-Conv2D_shape->kernel_size[0]+1); line++)
+        {
+            // Et pour chaque colonne d ela données d'entrée
+            for (int column = 0; column<(pBitmap->infoHeader.yResolution-Conv2D_shape->kernel_size[1]+1); column++)
+            {
+                float add_pixels = 0;
+                for (int window_x = 0; window_x<Conv2D_shape->kernel_size[0]; window_x++)
+                {
+                    for (int window_y = 0; window_y<Conv2D_shape->kernel_size[1]; window_y++)
+                    {
+                        add_pixels += (pBitmap->mPixels[window_x][window_y])*(couche->weights[window_x+window_y]);
+                    }
+                }
+                Conv2D_1_datas[neuron][line][column] += couche->bias[column+line];
+            }
+        }
     }
-    // Pour chaque neurone
 }
-// void Conv2D(int nb_filters, int kernel_size[2], char function_activation[], Couche_t couche) {
-//     printf("Conv2D: Number of filters: %d, Kernel size: [%d, %d], Activation function: %s\n",
-//            nb_filters, kernel_size[0], kernel_size[1], function_activation);
-    
-//     float *pixels;
-
-//     for (int neuron=0; neuron<nb_filters; neuron++)
-//     {
-//             // Pour chaque ligne de la sortie
-
-//     }
-//     // Pour chaque ligne de la sortie
-//     //      Pour chaque colonne de la sortie
-//     //          faire une conv_unit(x_pixels)
-//     sizeofoutput = entree-filtre+1
-// }
