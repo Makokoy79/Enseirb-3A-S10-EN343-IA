@@ -44,7 +44,7 @@ int calcul_nb_ligne(FILE *file) {
     return nb_lines;
 }
 
-void read_file(FILE *file, int nb_lines, float* texte) {
+void read_file(FILE *file, int nb_lines, double* texte) {
     if (file == NULL) {
         perror("Erreur d'ouverture du fichier");
         return;
@@ -128,7 +128,7 @@ void import_couche(Couche_t* couche, int i) {
         couche->nb_weights = nb_lines;
     }
 
-    couche->weights = (float *)malloc(couche->nb_weights * sizeof(float));
+    couche->weights = (double *)malloc(couche->nb_weights * sizeof(double));
 
     read_file(weights_file, couche->nb_weights, couche->weights);
 
@@ -156,7 +156,7 @@ void import_couche(Couche_t* couche, int i) {
         couche->nb_bias = nb_lines;
     }
 
-    couche->bias = (float *)malloc(couche->nb_bias * sizeof(float));
+    couche->bias = (double *)malloc(couche->nb_bias * sizeof(double));
     
     read_file(bias_file, couche->nb_bias, couche->bias);
 

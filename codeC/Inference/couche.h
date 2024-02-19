@@ -29,8 +29,8 @@ typedef struct
 {
     int nb_weights;
     int nb_bias;
-    float* weights;
-    float* bias;
+    double* weights;
+    double* bias;
 } Couche_t;
 
 typedef struct
@@ -54,7 +54,7 @@ typedef struct
 
 void print_float_matrix(float* matrix, int taille);
 int calcul_nb_ligne(FILE *file);
-void read_file(FILE *file, int nb_lines, float* texte);
+void read_file(FILE *file, int nb_lines, double* texte);
 void import_couche(Couche_t* couche, int i);
 void import_model(Model_t* model);
 
