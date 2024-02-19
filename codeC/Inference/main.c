@@ -60,7 +60,7 @@ int main(int argc, char* argv[]){
   Conv2D_1.kernel_size[1] = 3;
   Conv2D_1.activation = 'r';
 
-    // Allocation dynamique
+    // Allocation de mémoire pour le résultat de la convolution 2D numéro 1
     double*** Conv2D_1_datas = (double***)malloc(Conv2D_1.nb * sizeof(double**));
     for (int i = 0; i < Conv2D_1.nb; ++i) {
         Conv2D_1_datas[i] = (double**)malloc(26 * sizeof(double*));
@@ -76,16 +76,45 @@ int main(int argc, char* argv[]){
   /* Couche 1 */
   Conv2D(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
 
+  int nb_cases = 0;
+  for (int neuron=0; neuron<32; neuron++)
+  {
+      for (int ligne=0; ligne<26; ligne++)
+      {
+        for (int colonne=0; colonne<26; colonne++)
+        {
+          printf("Result neuron %d, case %d : %.20f\n", neuron, ligne+colonne, Conv2D_1_datas[neuron][ligne][colonne]);
+          nb_cases++;
+        }
+      }
+  }
+  // printf("Nombre de valeurs : %d\n", nb_cases);
+
+  //Max Pooling
+  Maxpool_t Max_pooling_1;
+  Max_pooling_1.nb = Conv2D_1.nb;
+  Max_pooling_1.kernel_size[0] = 2;
+  Max_pooling_1.kernel_size[1] = 2;
+  Max_pooling_1.lines = 26/Max_pooling_1.kernel_size[0];
+  Max_pooling_1.columns = 26/Max_pooling_1.kernel_size[1];  
+
+  // Allocation de mémoire pour le résultat du max_poolong 1
+  double*** max_pooling_1_datas = (double***)malloc(Conv2D_1.nb * sizeof(double**));
+  for (int i = 0; i < Conv2D_1.nb; ++i) {
+      max_pooling_1_datas[i] = (double**)malloc(Max_pooling_1.lines * sizeof(double*));
+      for (int j = 0; j < 26; ++j) {
+          max_pooling_1_datas[i][j] = (double*)malloc(Max_pooling_1.columns * sizeof(double));
+      }
+  }
+
   /* Debug couche 1 */
   printf("Debug couche 1 : Conv2D(32, kernel_size=(3, 3), activation=relu)\n");
   debug_couche1(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
 
 
-
-    //TODO
-
   //Max_pooling
-    //TODO
+  MaxPooling2D(Conv2D_1_datas, Max_pooling_1, max_pooling_1_datas);
+
 
   // Libérer la mémoire des données d'entrée de la fonction précédente
       for (int i = 0; i < Conv2D_1.nb; i++) {
@@ -94,9 +123,15 @@ int main(int argc, char* argv[]){
         }
         free(Conv2D_1_datas[i]);
     }
-    printf("desallouer conv2Ddata\n");
-    free(&Conv2D_1_datas);
-    printf("conv2Ddata désalloué\n");
+
+    // Libérer Conv2D_1_datas
+    for (int i = 0; i < Conv2D_1.nb; ++i) {
+        for (int j = 0; j < 26; ++j) {
+            free(Conv2D_1_datas[i][j]);
+        }
+        free(Conv2D_1_datas[i]);
+    }
+    free(Conv2D_1_datas);
 
   //Convolution 2D
     //TODO
