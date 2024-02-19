@@ -21,10 +21,10 @@ Pour exécuter, tapez : ./all
 
 int main(int argc, char* argv[]){
 
-  /********** Lilian : Import of the model with weights and biais **********/
+  /********** Import of the model with weights and biais **********/
 
   Model_t model;
-  model.nb_couche = 6;
+  model.nb_couche = 7;
   model.couches = (Couche_t *)malloc(model.nb_couche * sizeof(Couche_t));
 
   import_model(&model);
@@ -36,7 +36,7 @@ int main(int argc, char* argv[]){
   }
   free(model.couches);
 
-  /********** Rémy : Calcul  **********/
+  /********** Calcul  **********/
 
   BMP bitmap;
   FILE* pFichier=NULL;
@@ -117,7 +117,17 @@ int main(int argc, char* argv[]){
     // TODO
 
 
-   DesallouerBMP(&bitmap);
+  
+  /********** All free **********/
+
+  // Free couche
+  for (int i = 0; i < model.nb_couche; i++) {
+      free(model.couches[i].weights);
+      free(model.couches[i].bias);
+  }
+  free(model.couches);
+  
+  DesallouerBMP(&bitmap);
 
 
   return 0;
