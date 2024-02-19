@@ -14,7 +14,7 @@ Pour exécuter, tapez : /
 
 #include "couche.h"
 
-void print_float_matrix(float* matrix, int taille) {
+void print_double_matrix(double* matrix, int taille) {
     for (int i = 0; i < taille; i++) {
         printf("%f\t", matrix[i]);
 
@@ -44,7 +44,7 @@ int calcul_nb_ligne(FILE *file) {
     return nb_lines;
 }
 
-void read_file(FILE *file, int nb_lines, float* texte) {
+void read_file(FILE *file, int nb_lines, double* texte) {
     if (file == NULL) {
         perror("Erreur d'ouverture du fichier");
         return;
@@ -128,12 +128,12 @@ void import_couche(Couche_t* couche, int i) {
         couche->nb_weights = nb_lines;
     }
 
-    couche->weights = (float *)malloc(couche->nb_weights * sizeof(float));
+    couche->weights = (double *)malloc(couche->nb_weights * sizeof(double));
 
     read_file(weights_file, couche->nb_weights, couche->weights);
 
     // printf("Matrix of weights:\n");
-    // print_float_matrix(couche->weights, couche->nb_weights);
+    // print_double_matrix(couche->weights, couche->nb_weights);
 
     /********** Bias **********/
     bias_file = fopen(bias_filename, "r");
@@ -156,12 +156,12 @@ void import_couche(Couche_t* couche, int i) {
         couche->nb_bias = nb_lines;
     }
 
-    couche->bias = (float *)malloc(couche->nb_bias * sizeof(float));
+    couche->bias = (double *)malloc(couche->nb_bias * sizeof(double));
     
     read_file(bias_file, couche->nb_bias, couche->bias);
 
     // printf("Matrix of bias:\n");
-    // print_float_matrix(couche->bias, couche->nb_bias);
+    // print_double_matrix(couche->bias, couche->nb_bias);
     
     free(weights_filename);
     free(bias_filename);
@@ -178,13 +178,13 @@ void import_model(Model_t* model) {
 
     for (int i = 0; i < model->nb_couche; i++)
     {
-        import_couche(&model->couches[i], i);
+        import_couche(&model->couches[i], i+1);
         // printf("\n");
         // printf("Weights\n");
-        // print_float_matrix(model->couches->weights, model->couches->nb_weights);
+        // print_double_matrix(model->couches->weights, model->couches->nb_weights);
         // printf("\n");
         // printf("Bias\n");
-        // print_float_matrix(model->couches->bias, model->couches->nb_bias);
+        // print_double_matrix(model->couches->bias, model->couches->nb_bias);
         printf("\n\n");
     }
     
@@ -192,9 +192,9 @@ void import_model(Model_t* model) {
 
 
 
-float conv_unit(float *pixels, int nb_pixels, float weight, float bias)
+double conv_unit(double *pixels, int nb_pixels, double weight, double bias)
 {
-    float conv = 0;
+    double conv = 0;
     for (int i=0; i<nb_pixels; i++)
     {
         conv += pixels[i];//*poids en cours
@@ -202,26 +202,29 @@ float conv_unit(float *pixels, int nb_pixels, float weight, float bias)
     return (conv)/nb_pixels+bias; // Biais du neurone
 }
 
-void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, float*** Conv2D_1_datas) {
+void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas) {
     //Pour chaque neurone à traiter
     for (int neuron = 0; neuron<Conv2D_shape->nb; neuron++)
     {
         // Pour chaque ligne de la donnée d'entrée
-        for (int line = 0; line<(pBitmap->infoHeader.xResolution-Conv2D_shape->kernel_size[0]+1); line++)
+        for (int line = 0; line<(pBitmap->infoHeader.largeur-Conv2D_shape->kernel_size[0]+1); line++)
         {
-            // Et pour chaque colonne d ela données d'entrée
-            for (int column = 0; column<(pBitmap->infoHeader.yResolution-Conv2D_shape->kernel_size[1]+1); column++)
+            // Et pour chaque colonne de la données d'entrée
+            for (int column = 0; column<(pBitmap->infoHeader.hauteur-Conv2D_shape->kernel_size[1]+1); column++)
             {
-                float add_pixels = 0;
+                Conv2D_1_datas[neuron][line][column] = 0;
+                double add_pixels = 0;
                 for (int window_x = 0; window_x<Conv2D_shape->kernel_size[0]; window_x++)
                 {
                     for (int window_y = 0; window_y<Conv2D_shape->kernel_size[1]; window_y++)
                     {
-                        add_pixels += (pBitmap->mPixels[window_x][window_y])*(couche->weights[window_x+window_y]);
+                        add_pixels += (pBitmap->mPixelsGray[line+window_x][column+window_y])*(couche->weights[neuron*Conv2D_shape->kernel_size[0]*Conv2D_shape->kernel_size[1]+line+column]);
                     }
+                    //add_pixels /= Conv2D_shape->kernel_size[0]*Conv2D_shape->kernel_size[1];
                 }
-                Conv2D_1_datas[neuron][line][column] += couche->bias[column+line];
+                Conv2D_1_datas[neuron][line][column] += couche->bias[neuron];
             }
         }
+        printf("Neurone %d OK\n", neuron);
     }
 }

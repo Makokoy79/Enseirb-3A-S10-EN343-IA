@@ -23,25 +23,21 @@ int main(int argc, char* argv[]){
 
   /********** Lilian : Import of the model with weights and biais **********/
 
-  Model_t model;
-  model.nb_couche = 6;
-  model.couches = (Couche_t *)malloc(model.nb_couche * sizeof(Couche_t));
+  Model_t Neural_net;
+  Neural_net.nb_couche = 6;
+  Neural_net.couches = (Couche_t *)malloc(Neural_net.nb_couche * sizeof(Couche_t));
 
-  import_model(&model);
+  import_model(&Neural_net);
 
 
-  for (int i = 0; i < model.nb_couche; i++) {
-      free(model.couches[i].weights);
-      free(model.couches[i].bias);
-  }
-  free(model.couches);
+  
 
   /********** Rémy : Calcul  **********/
 
   BMP bitmap;
   FILE* pFichier=NULL;
 
-  pFichier=fopen("0_1.bmp", "rb");     //Ouverture du fichier contenant l'image
+  pFichier=fopen("../Lecture/0_1.bmp", "rb");     //Ouverture du fichier contenant l'image
   if (pFichier==NULL) {
       printf("%s\n", "0_1.bmp");
       printf("Erreur dans la lecture du fichier\n");
@@ -59,7 +55,6 @@ int main(int argc, char* argv[]){
         layers.Flatten(),
         layers.Dense(test_nb, activation="softmax"), */
 
-  Model_t Neural_net;
 
   //Convolution 2D
   Conv2D_t Conv2D_1;
@@ -68,32 +63,19 @@ int main(int argc, char* argv[]){
   Conv2D_1.kernel_size[1] = 3;
   Conv2D_1.activation = 'r';
 
-/* Allocation mémoire*/
-
-    // Alloue de la mémoire pour x neurones de la couche
-    float*** Conv2D_1_datas = malloc(Conv2D_1.nb * sizeof(float**));
-    if (Conv2D_1_datas == NULL) {
-        perror("Allocation de mémoire a échoué");
-        exit(EXIT_FAILURE);
-    }
-
-    // Alloue de la mémoire pour chaque espace de 26x26 float (taille de la sortie)
-    for (int i = 0; i < Conv2D_1.nb; i++) {
-        Conv2D_1_datas[i] = malloc(bitmap.infoHeader.xResolution * sizeof(float*)); // Allouer un tableau de 26 pointeurs vers float
-        if (Conv2D_1_datas[i] == NULL) {
-            perror("Allocation de mémoire a échoué");
-            exit(EXIT_FAILURE);
-        }
-        for (int j = 0; j < 26; j++) {
-            Conv2D_1_datas[i][j] = malloc(bitmap.infoHeader.xResolution * sizeof(float)); // Allouer un tableau de 26 float
-            if (Conv2D_1_datas[i][j] == NULL) {
-                perror("Allocation de mémoire a échoué");
-                exit(EXIT_FAILURE);
-            }
+    // Allocation dynamique
+    double*** Conv2D_1_datas = (double***)malloc(Conv2D_1.nb * sizeof(double**));
+    for (int i = 0; i < Conv2D_1.nb; ++i) {
+        Conv2D_1_datas[i] = (double**)malloc(26 * sizeof(double*));
+        for (int j = 0; j < 26; ++j) {
+            Conv2D_1_datas[i][j] = (double*)malloc(26 * sizeof(double));
         }
     }
 
-  Conv2D(&bitmap, &Conv2D_1, &Neural_net.couches[0], &Conv2D_1_datas);
+  // printf("Taille de l'image chargée en x : [%d]\n", bitmap.infoHeader.largeur);
+
+
+  Conv2D(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
     //TODO
 
   //Max_pooling
@@ -106,7 +88,10 @@ int main(int argc, char* argv[]){
         }
         free(Conv2D_1_datas[i]);
     }
-    free(Conv2D_1_datas);
+    printf("desallouer conv2Ddata\n");
+    free(&Conv2D_1_datas);
+    printf("conv2Ddata désalloué\n");
+
   //Convolution 2D
     //TODO
 
@@ -117,7 +102,13 @@ int main(int argc, char* argv[]){
     // TODO
 
 
-   DesallouerBMP(&bitmap);
+  DesallouerBMP(&bitmap);
+
+   for (int i = 0; i < Neural_net.nb_couche; i++) {
+     free(Neural_net.couches[i].weights);
+     free(Neural_net.couches[i].bias);
+   }
+   free(Neural_net.couches);
 
 
   return 0;

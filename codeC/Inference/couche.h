@@ -29,8 +29,8 @@ typedef struct
 {
     int nb_weights;
     int nb_bias;
-    float* weights;
-    float* bias;
+    double* weights;
+    double* bias;
 } Couche_t;
 
 typedef struct
@@ -52,15 +52,15 @@ typedef struct
 } MaxPool_t;
 
 
-void print_float_matrix(float* matrix, int taille);
+void print_double_matrix(double* matrix, int taille);
 int calcul_nb_ligne(FILE *file);
-void read_file(FILE *file, int nb_lines, float* texte);
+void read_file(FILE *file, int nb_lines, double* texte);
 void import_couche(Couche_t* couche, int i);
 void import_model(Model_t* model);
 
-float conv_unit(float *pixels, int nb_pixels, float weight, float bias);
+double conv_unit(double *pixels, int nb_pixels, double weight, double bias);
 
-void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, float*** Conv2D_1_datas);
+void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas);
 void MaxPooling2D(int pool_size[2], Couche_t couche);
 
 #endif
