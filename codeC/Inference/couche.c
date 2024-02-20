@@ -268,7 +268,6 @@ void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, doubl
     // print_float_matrix(nb_lines, inter_value);
 
     Conv2D(pBitmap, Conv2D_shape, couche, Conv2D_1_datas);
-<<<<<<< HEAD
 
     int nb_cases = 0;
     int res = 0;
@@ -285,8 +284,6 @@ void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, doubl
     }
     printf("Results : %d/%d\n", res, nb_cases);
         
-=======
->>>>>>> a0ce32b6107fb864057157f216ce45c1bf6a4edc
 
     // Check();
 
