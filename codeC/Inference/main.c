@@ -19,6 +19,18 @@ Pour exécuter, tapez : ./all
 
 int main(int argc, char* argv[]){
 
+  BMP bitmap;
+  FILE* pFichier=NULL;
+
+  pFichier=fopen("../Lecture/0_1.bmp", "rb");     //Ouverture du fichier contenant l'image
+  if (pFichier==NULL) {
+      printf("%s\n", "0_1.bmp");
+      printf("Erreur dans la lecture du fichier\n");
+  }
+  LireBitmap(pFichier, &bitmap);
+  fclose(pFichier);               //Fermeture du fichier contenant l'image
+
+  ConvertRGB2Gray(&bitmap);
   /********** Lilian : Import of the model with weights and biais **********/
 
   Model_t Neural_net;
@@ -29,8 +41,24 @@ int main(int argc, char* argv[]){
   Neural_net.couches[0].nb_neurons = 1;
   Neural_net.couches[0].nb_weights = 0;
   Neural_net.couches[0].nb_bias = 0;
-  Neural_net.couches[0].lines = 28;
-  Neural_net.couches[0].columns = 28;
+  Neural_net.couches[0].lines = bitmap.infoHeader.hauteur;
+  Neural_net.couches[0].columns = bitmap.infoHeader.largeur;
+  // Allocation de mémoire pour l'image
+  Neural_net.couches[0].data = (double***)malloc(Neural_net.couches[0].nb_neurons * sizeof(double**));
+  for (int i = 0; i < Neural_net.couches[0].lines; ++i) {
+      Neural_net.couches[0].data[i] = (double**)malloc(Neural_net.couches[0].lines * sizeof(double*));
+      for (int j = 0; j < Neural_net.couches[0].columns; ++j) {
+          Neural_net.couches[0].data[i][j] = (double*)malloc(Neural_net.couches[0].columns * sizeof(double));
+      }
+  }
+  // Récupération des données de l'image
+  for (int line=0; line<Neural_net.couches[0].lines; line++)
+  {
+    for (int column=0; column<Neural_net.couches[0].columns; column++)
+    {
+      Neural_net.couches[0].data[0][line][column] = bitmap.mPixelsGray[line][column];
+    }
+  }
 // Couche 1 => Convolution 2D
   Neural_net.couches[1].nb_neurons = 32;
   Neural_net.couches[1].nb_weights = 0;
@@ -40,6 +68,16 @@ int main(int argc, char* argv[]){
   Neural_net.couches[1].lines = Neural_net.couches[0].lines-Neural_net.couches[1].kernel[0]+1;
   Neural_net.couches[1].columns = Neural_net.couches[0].columns-Neural_net.couches[1].kernel[1]+1;
   Neural_net.couches[1].activation = 'R';
+  // Allocation de mémoire pour le résultat de la convolution 2D numéro 1
+  Neural_net.couches[1].data = (double***)malloc(Neural_net.couches[1].nb_neurons * sizeof(double**));
+  for (int i = 0; i < Neural_net.couches[1].nb_neurons; ++i)
+  {
+      Neural_net.couches[1].data[i] = (double**)malloc(Neural_net.couches[1].lines * sizeof(double*));
+      for (int j = 0; j < Neural_net.couches[1].columns; ++j) {
+          Neural_net.couches[1].data[i][j] = (double*)malloc(Neural_net.couches[1].columns * sizeof(double));
+      }
+  }
+
 // Couche 2 => Max Pooling
   Neural_net.couches[2].nb_neurons = Neural_net.couches[1].nb_neurons;
   Neural_net.couches[2].nb_weights = 0;
@@ -75,24 +113,10 @@ int main(int argc, char* argv[]){
   Neural_net.couches[6].lines = Neural_net.couches[6].nb_neurons;
   Neural_net.couches[6].columns = 10;
 
-printf("Importation du modèle\n");
   import_model(&Neural_net);
-printf("Importation du modèle OK\n");
 
   /********** Rémy : Calcul  **********/
 
-  BMP bitmap;
-  FILE* pFichier=NULL;
-
-  pFichier=fopen("../Lecture/0_1.bmp", "rb");     //Ouverture du fichier contenant l'image
-  if (pFichier==NULL) {
-      printf("%s\n", "0_1.bmp");
-      printf("Erreur dans la lecture du fichier\n");
-  }
-  LireBitmap(pFichier, &bitmap);
-  fclose(pFichier);               //Fermeture du fichier contenant l'image
-
-  ConvertRGB2Gray(&bitmap);
 
 /*      keras.Input(shape=input_shape),
         layers.Conv2D(32, kernel=(3, 3), activation="relu"),
@@ -102,35 +126,16 @@ printf("Importation du modèle OK\n");
         layers.Flatten(),
         layers.Dense(test_nb, activation="softmax"), */
 
-
-  //Convolution 2D
-  Conv2D_t Conv2D_1;
-  Conv2D_1.nb = 32;
-  Conv2D_1.kernel[0] = 3;
-  Conv2D_1.kernel[1] = 3;
-  Conv2D_1.activation = 'r';
-    // Allocation de mémoire pour le résultat de la convolution 2D numéro 1
-    double*** Conv2D_1_datas = (double***)malloc(Conv2D_1.nb * sizeof(double**));
-    for (int i = 0; i < Conv2D_1.nb; ++i) {
-        Conv2D_1_datas[i] = (double**)malloc(26 * sizeof(double*));
-        for (int j = 0; j < 26; ++j) {
-            Conv2D_1_datas[i][j] = (double*)malloc(26 * sizeof(double));
-        }
-    }
-
   // printf("Taille de l'image chargée en x : [%d]\n", bitmap.infoHeader.largeur);
 
 
   
   /* Couche 1 */
-  printf("Traitement couche 1 : Convolution 2D\n");
-  // Conv2D(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
-
   Conv2D(&Neural_net.couches[0], &Neural_net.couches[1]);
   printf("Fin de traitement couche 1 : Convolution 2D\n");
 
   // Affichage des résultats de la couche 1 (Convolution 2D)
-/*
+/* 
   int nb_cases = 0;
   for (int neuron=0; neuron<32; neuron++)
   {
@@ -138,30 +143,15 @@ printf("Importation du modèle OK\n");
       {
         for (int colonne=0; colonne<26; colonne++)
         {
-          printf("Result neuron %d, case %d : %.20f\n", neuron, ligne+colonne, Conv2D_1_datas[neuron][ligne][colonne]);
+          printf("Result neuron %d, case %d : %.20f\n", neuron, (ligne*10)+colonne+1, Neural_net.couches[1].data[neuron][ligne][colonne]);
           nb_cases++;
         }
       }
   }
-*/
-  // printf("Nombre de valeurs : %d\n", nb_cases);
+  printf("Nombre de valeurs : %d\n", nb_cases);
+   */
 
   //Max Pooling
-  Maxpool_t Max_pooling_1;
-  Max_pooling_1.nb = Conv2D_1.nb;
-  Max_pooling_1.kernel[0] = 2;
-  Max_pooling_1.kernel[1] = 2;
-  Max_pooling_1.lines = 26/Max_pooling_1.kernel[0];
-  Max_pooling_1.columns = 26/Max_pooling_1.kernel[1];  
-
-  // Allocation de mémoire pour le résultat du max_poolong 1
-  double*** max_pooling_1_datas = (double***)malloc(Conv2D_1.nb * sizeof(double**));
-  for (int i = 0; i < Conv2D_1.nb; ++i) {
-      max_pooling_1_datas[i] = (double**)malloc(Max_pooling_1.lines * sizeof(double*));
-      for (int j = 0; j < 26; ++j) {
-          max_pooling_1_datas[i][j] = (double*)malloc(Max_pooling_1.columns * sizeof(double));
-      }
-  }
 
   /* Debug couche 1 */
   // printf("Debug couche 1 : Conv2D(32, kernel=(3, 3), activation=relu)\n");
@@ -169,21 +159,22 @@ printf("Importation du modèle OK\n");
 
 
   //Max_pooling
-  printf("Traitement couche 2 : Max_pooling\n");
-  MaxPooling2D(Conv2D_1_datas, Max_pooling_1, max_pooling_1_datas);
   printf("Fin de traitement couche 2 : Max_pooling\n");
-
-    // Libérer Conv2D_1_datas
-    for (int i = 0; i < Conv2D_1.nb; ++i) {
-        for (int j = 0; j < 26; ++j) {
-            free(Conv2D_1_datas[i][j]);
+  // Affichage des résultats de la couche 1 (Convolution 2D)
+/*   int nb_cases = 0;
+  for (int neuron=0; neuron<32; neuron++)
+  {
+      for (int ligne=0; ligne<13; ligne++)
+      {
+        for (int colonne=0; colonne<13; colonne++)
+        {
+          printf("Result neuron %d, case %d : %.20f\n", neuron, (ligne*10)+colonne+1, Neural_net.couches[1].data[neuron][ligne][colonne]);
+          nb_cases++;
         }
-        free(Conv2D_1_datas[i]);
-    }
-    free(Conv2D_1_datas);
-
-  printf("Libération de la mémoire de la couche convolutive 1 ==> OK\n");
-
+      }
+  }
+  printf("Nombre de valeurs : %d\n", nb_cases);
+ */
   //Convolution 2D
     //TODO
 
