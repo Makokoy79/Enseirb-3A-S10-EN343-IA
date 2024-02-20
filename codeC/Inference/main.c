@@ -21,9 +21,8 @@ int main(int argc, char* argv[]){
 
   /********** Lilian : Import of the model with weights and biais **********/
 
-
   Model_t Neural_net;
-  Neural_net.nb_couche = 6;
+  Neural_net.nb_couche = 7;
   Neural_net.couches = (Couche_t *)malloc(Neural_net.nb_couche * sizeof(Couche_t));
 
 // "Couche 0" => Image d'entrée
@@ -69,11 +68,16 @@ int main(int argc, char* argv[]){
 // Couche 5 => Flatten
   Neural_net.couches[5].nb_neurons = 1;
   Neural_net.couches[5].lines = Neural_net.couches[5].nb_neurons;
+  Neural_net.couches[5].columns = Neural_net.couches[4].nb_neurons*Neural_net.couches[4].lines*Neural_net.couches[4].columns;
+
 // Couche 6 => Dense
   Neural_net.couches[6].nb_neurons = Neural_net.couches[5].nb_neurons;
   Neural_net.couches[6].lines = Neural_net.couches[6].nb_neurons;
+  Neural_net.couches[6].columns = 10;
 
+printf("Importation du modèle\n");
   import_model(&Neural_net);
+printf("Importation du modèle OK\n");
 
   /********** Rémy : Calcul  **********/
 
@@ -105,7 +109,6 @@ int main(int argc, char* argv[]){
   Conv2D_1.kernel[0] = 3;
   Conv2D_1.kernel[1] = 3;
   Conv2D_1.activation = 'r';
-
     // Allocation de mémoire pour le résultat de la convolution 2D numéro 1
     double*** Conv2D_1_datas = (double***)malloc(Conv2D_1.nb * sizeof(double**));
     for (int i = 0; i < Conv2D_1.nb; ++i) {
@@ -121,7 +124,9 @@ int main(int argc, char* argv[]){
   
   /* Couche 1 */
   printf("Traitement couche 1 : Convolution 2D\n");
-  Conv2D(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
+  // Conv2D(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
+
+  Conv2D(&Neural_net.couches[0], &Neural_net.couches[1]);
   printf("Fin de traitement couche 1 : Convolution 2D\n");
 
   // Affichage des résultats de la couche 1 (Convolution 2D)
