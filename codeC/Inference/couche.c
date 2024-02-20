@@ -222,37 +222,6 @@ double conv_unit(double *pixels, int nb_pixels, double weight, double bias)
     return (conv)/nb_pixels+bias; // Biais du neurone
 }
 
-/* // Convolution 2D initiale
-void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas) {
-    //Pour chaque neurone à traiter
-    for (int neuron = 0; neuron<Conv2D_shape->nb; neuron++)
-    {
-        // Pour chaque ligne de la donnée d'entrée
-        for (int line = 0; line<(pBitmap->infoHeader.largeur-Conv2D_shape->kernel[0]+1); line++)
-        {
-            // Et pour chaque colonne de la données d'entrée
-            for (int column = 0; column<(pBitmap->infoHeader.hauteur-Conv2D_shape->kernel[1]+1); column++)
-            {
-                Conv2D_1_datas[neuron][line][column] = 0;
-                for (int window_x = 0; window_x<Conv2D_shape->kernel[0]; window_x++)
-                {
-                    for (int window_y = 0; window_y<Conv2D_shape->kernel[1]; window_y++)
-                    {
-                        Conv2D_1_datas[neuron][line][column] += (pBitmap->mPixelsGray[line+window_x][column+window_y])*(couche->weights[neuron+window_x+window_y]);
-                    }
-                }
-                (Conv2D_1_datas[neuron][line][column] += couche->bias[neuron]);
-                // Fonction d'activation RELU
-                if (Conv2D_1_datas[neuron][line][column]< 0)
-                {
-                    Conv2D_1_datas[neuron][line][column] = 0;
-                }
-            }
-        }
-    }
-}
-*/
-
 void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
     //Pour chaque neurone à traiter
     for (int neuron = 0; neuron<couche_out->nb_neurons; neuron++)
@@ -268,7 +237,9 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
                 {
                     for (int window_y = 0; window_y<couche_out->kernel[1]; window_y++)
                     {
-                        couche_out->data[neuron][line][column] += ((couche_in->data[0][line+window_x][column+window_y])/255)*(couche_out->weights[neuron+window_x+window_y]);
+                        // A revoir
+                        int weight = couche_out->weights[neuron*couche_out->nb_neurons + window_x*couche_out->kernel[0]+window_y];
+                        couche_out->data[neuron][line][column] += (couche_in->data[0][line+window_x*couche_out->kernel[0]][column+window_y])*weight;
                     }
                 }
                 (couche_out->data[neuron][line][column] += couche_out->bias[neuron]);
@@ -332,34 +303,6 @@ void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, doubl
 
     // fclose(inter_file);
 }
-
-/* void MaxPooling2D(double*** Conv2D_datas, Maxpool_t max_pool_shape, double*** Max_Pool_datas)
-{
-    for (int neuron = 0; neuron<max_pool_shape.nb; neuron++)
-    {
-        for (int line=0; line<max_pool_shape.lines; line++)
-        {
-            for (int column=0; column<max_pool_shape.columns; column++)
-            {
-                double max = Conv2D_datas[neuron][line*max_pool_shape.kernel[0]][column*max_pool_shape.kernel[1]];
-                for (int window_x=0; window_x<max_pool_shape.kernel[0]; window_x++)
-                {
-                    for (int window_y=0; window_y<max_pool_shape.kernel[1]; window_y++)
-                    {
-                        if (window_x==0 && window_y==0)
-                        {
-                            max = Conv2D_datas[neuron][(line*max_pool_shape.kernel[0])][(column*max_pool_shape.kernel[1])];
-                        }else if (Conv2D_datas[neuron][(line*max_pool_shape.kernel[0])+window_x][(column*max_pool_shape.kernel[1])+window_y] > max)
-                        {
-                            max = Conv2D_datas[neuron][(line*max_pool_shape.kernel[0])+window_x][(column*max_pool_shape.kernel[1])+window_y];
-                        }
-                    }
-                }
-                Max_Pool_datas[neuron][line/max_pool_shape.kernel[0]][column/max_pool_shape.kernel[1]] = max;
-            }
-        }
-    }
-} */
 
 void MaxPooling2D(Couche_t* couche_in, Couche_t* couche_out)
 {

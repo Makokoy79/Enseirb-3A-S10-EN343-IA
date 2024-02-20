@@ -18,7 +18,7 @@ Pour exécuter, tapez : ./all
 #include "couche.h"
 
 int main(int argc, char* argv[]){
-
+  // Ouverture du fichier image traitée
   BMP bitmap;
   FILE* pFichier=NULL;
 
@@ -56,9 +56,10 @@ int main(int argc, char* argv[]){
   {
     for (int column=0; column<Neural_net.couches[0].columns; column++)
     {
-      Neural_net.couches[0].data[0][line][column] = bitmap.mPixelsGray[line][column];
+      Neural_net.couches[0].data[0][line][column] = (double)bitmap.mPixelsGray[line][column]/255;
     }
   }
+  // Libérer bitmap
 // Couche 1 => Convolution 2D
   Neural_net.couches[1].nb_neurons = 32;
   Neural_net.couches[1].nb_weights = 0;
@@ -86,6 +87,7 @@ int main(int argc, char* argv[]){
   Neural_net.couches[2].kernel[1] = 2;
   Neural_net.couches[2].lines = Neural_net.couches[1].lines/Neural_net.couches[2].kernel[0];
   Neural_net.couches[2].columns = Neural_net.couches[1].columns/Neural_net.couches[2].kernel[1];
+
 // Couche 3 => Convolution 2D
   Neural_net.couches[3].nb_neurons = 64;
   Neural_net.couches[3].nb_weights = 0;
@@ -95,6 +97,7 @@ int main(int argc, char* argv[]){
   Neural_net.couches[3].lines = Neural_net.couches[2].lines-Neural_net.couches[3].kernel[0]+1;
   Neural_net.couches[3].columns = Neural_net.couches[2].columns-Neural_net.couches[3].kernel[1]+1;
   Neural_net.couches[3].activation = 'R';
+  
 // Couche 4 => Max Pooling
   Neural_net.couches[4].nb_neurons = Neural_net.couches[2].nb_neurons;
   Neural_net.couches[4].nb_weights = 0;
@@ -103,6 +106,7 @@ int main(int argc, char* argv[]){
   Neural_net.couches[4].kernel[1] = 2;
   Neural_net.couches[4].lines = Neural_net.couches[3].lines/Neural_net.couches[4].kernel[0];
   Neural_net.couches[4].columns = Neural_net.couches[3].columns/Neural_net.couches[4].kernel[1];
+
 // Couche 5 => Flatten
   Neural_net.couches[5].nb_neurons = 1;
   Neural_net.couches[5].lines = Neural_net.couches[5].nb_neurons;
@@ -142,19 +146,19 @@ int main(int argc, char* argv[]){
 
   // Affichage des résultats de la couche 1 (Convolution 2D)
 
-  // int nb_cases = 0;
-  // for (int neuron=0; neuron<32; neuron++)
-  // {
-  //     for (int ligne=0; ligne<26; ligne++)
-  //     {
-  //       for (int colonne=0; colonne<26; colonne++)
-  //       {
-  //         printf("Result neuron %d, case %d : %.20f\n", neuron, (ligne*10)+colonne+1, Neural_net.couches[1].data[neuron][ligne][colonne]);
-  //         nb_cases++;
-  //       }
-  //     }
-  // }
-  // printf("Nombre de valeurs : %d\n", nb_cases);
+  int nb_cases = 0;
+  for (int neuron=0; neuron<32; neuron++)
+  {
+      for (int ligne=0; ligne<26; ligne++)
+      {
+        for (int colonne=0; colonne<26; colonne++)
+        {
+          printf("Result neuron %d, case %d : %.20f\n", neuron, (ligne*10)+colonne+1, Neural_net.couches[1].data[neuron][ligne][colonne]);
+          nb_cases++;
+        }
+      }
+  }
+  printf("Nombre de valeurs : %d\n", nb_cases);
   printf("Result neuron %d, case %d : %.20f\n", 1, 4, Neural_net.couches[1].data[1][0][3]);
   printf("Result neuron %d, case %d : %.20f\n", 7, 1, Neural_net.couches[1].data[7][0][0]);
   printf("Result neuron %d, case %d : %.20f\n", 0, 1, Neural_net.couches[1].data[15][0][0]);
