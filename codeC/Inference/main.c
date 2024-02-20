@@ -22,7 +22,7 @@ int main(int argc, char* argv[]){
   BMP bitmap;
   FILE* pFichier=NULL;
 
-  pFichier=fopen("../Lecture/0_1.bmp", "rb");     //Ouverture du fichier contenant l'image
+  pFichier=fopen("../Lecture/0_20.bmp", "rb");     //Ouverture du fichier contenant l'image
   if (pFichier==NULL) {
       printf("%s\n", "0_1.bmp");
       printf("Erreur dans la lecture du fichier\n");
@@ -146,21 +146,24 @@ int main(int argc, char* argv[]){
 
 
   // Affichage des résultats de la couche 1 (Convolution 2D)
-/* 
-  int nb_cases = 0;
-  for (int neuron=0; neuron<32; neuron++)
-  {
-      for (int ligne=0; ligne<26; ligne++)
-      {
-        for (int colonne=0; colonne<26; colonne++)
-        {
-          printf("Result neuron %d, case %d : %.20f\n", neuron, (ligne*10)+colonne+1, Neural_net.couches[1].data[neuron][ligne][colonne]);
-          nb_cases++;
-        }
-      }
-  }
-  printf("Nombre de valeurs : %d\n", nb_cases);
-   */
+
+  // int nb_cases = 0;
+  // for (int neuron=0; neuron<32; neuron++)
+  // {
+  //     for (int ligne=0; ligne<26; ligne++)
+  //     {
+  //       for (int colonne=0; colonne<26; colonne++)
+  //       {
+  //         printf("Result neuron %d, case %d : %.20f\n", neuron, (ligne*10)+colonne+1, Neural_net.couches[1].data[neuron][ligne][colonne]);
+  //         nb_cases++;
+  //       }
+  //     }
+  // }
+  // printf("Nombre de valeurs : %d\n", nb_cases);
+  printf("Result neuron %d, case %d : %.20f\n", 1, 4, Neural_net.couches[1].data[1][0][3]);
+  printf("Result neuron %d, case %d : %.20f\n", 7, 1, Neural_net.couches[1].data[7][0][0]);
+  printf("Result neuron %d, case %d : %.20f\n", 0, 1, Neural_net.couches[1].data[15][0][0]);
+
 
   //Max Pooling
 
