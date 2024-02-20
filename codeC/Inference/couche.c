@@ -26,7 +26,7 @@ void print_double_matrix(double* matrix, int taille) {
     printf("\n");
 }
 
-int calcul_nb_ligne(FILE *file) {
+int calcul_nb_line(FILE *file) {
     int nb_lines = 0;
     char ch;
 
@@ -44,7 +44,25 @@ int calcul_nb_ligne(FILE *file) {
     return nb_lines;
 }
 
-void read_file(FILE *file, int nb_lines, double* texte) {
+int calcul_nb_values_per_line(FILE *file) {
+    int values_per_line = 0;
+    char ch;
+
+    // Count the number of values in the first line
+    while ((ch = fgetc(file)) != EOF && ch != '\n') {
+        if (ch == ' ') {
+            values_per_line++;
+        }
+    }
+
+    // Rewind the file
+    rewind(file);
+
+    // Increment by 1 to account for the last value in the line
+    return values_per_line + 1;
+}
+
+void read_file(FILE *file, int nb_lines, int nb_values_per_line, double* texte) {
     if (file == NULL) {
         perror("Erreur d'ouverture du fichier");
         return;
@@ -54,9 +72,14 @@ void read_file(FILE *file, int nb_lines, double* texte) {
 
     for (int i = 0; i < nb_lines; i++) {
         if (fgets(buffer, sizeof(buffer), file) != NULL) {
-            // printf("Texte %d : %s\n", i + 1, buffer);
-            texte[i] = atof(buffer);
-            // printf("Couche %d : %10f\n", i + 1, texte[i]);
+            // Read the values into the allocated memory
+            char *token = strtok(buffer, " ");
+            int j = 0;
+            while (token != NULL && j < nb_values_per_line) {
+                texte[i * nb_values_per_line + j] = atof(token);
+                token = strtok(NULL, " ");
+                j++;
+            }
         } else {
             printf("Erreur de lecture de la ligne %d\n", i + 1);
             exit(EXIT_FAILURE);
@@ -102,38 +125,37 @@ void import_couche(Couche_t* couche, int i) {
     strcat(bias_filename, "-");
     strcat(bias_filename, FILE_BIAS);
     strcat(bias_filename, FILE_EXTENSION);
-    printf("Filename: %s\n", bias_filename);
-
-    
+    printf("Filename: %s\n", bias_filename);    
 
     /********** Weights **********/
     weights_file = fopen(weights_filename, "r");
 
     if (weights_file == NULL) {
         printf("No weights and bias in couche %d\n", i);
+        couche->nb_neurons = 0;
         couche->nb_weights = 0;
         couche->nb_bias = 0;
         return;
     }
 
-    nb_lines = calcul_nb_ligne(weights_file);
+    nb_lines = calcul_nb_line(weights_file);
+
+    couche->nb_weights = calcul_nb_values_per_line(weights_file);
+    printf("Number of weights per layer %d\n", couche->nb_weights);
 
     if (nb_lines == 0) {
-        printf("No weights in couche %d\n", i);
-        couche->nb_weights = 0;
+        printf("No neurons in layer %d\n", i);
+        couche->nb_neurons = 0;
     }
     else
     {
-        printf("Number of weights in couche %d\n", nb_lines);
-        couche->nb_weights = nb_lines;
+        printf("Number of neurons in layer %d\n", nb_lines);
+        couche->nb_neurons = nb_lines;
     }
 
-    couche->weights = (double *)malloc(couche->nb_weights * sizeof(double));
+    couche->weights = (double *)malloc(couche->nb_neurons * couche->nb_weights * sizeof(double));
 
-    read_file(weights_file, couche->nb_weights, couche->weights);
-
-    // printf("Matrix of weights:\n");
-    // print_double_matrix(couche->weights, couche->nb_weights);
+    read_file(weights_file, couche->nb_neurons, couche->nb_weights, couche->weights);
 
     /********** Bias **********/
     bias_file = fopen(bias_filename, "r");
@@ -144,24 +166,24 @@ void import_couche(Couche_t* couche, int i) {
         return;
     }
 
-    nb_lines = calcul_nb_ligne(bias_file);
+    nb_lines = calcul_nb_line(bias_file);
 
-    if (nb_lines == 0) {
-        printf("No bias in couche %d\n", i);
-        couche->nb_bias = 0;
+    couche->nb_bias = calcul_nb_values_per_line(bias_file);
+    printf("Number of bias per layer %d\n", couche->nb_bias);
+
+    if (nb_lines != couche->nb_neurons) {
+        printf("Error, not the same number of neurons in weight and bias files\n");
+        return;
     }
-    else
+    else if (nb_lines == 0)
     {
-        printf("Number of bias in couche %d\n", nb_lines);
-        couche->nb_bias = nb_lines;
+        printf("No neurons in layer %d\n", i);
+        couche->nb_neurons = 0;
     }
-
-    couche->bias = (double *)malloc(couche->nb_bias * sizeof(double));
     
-    read_file(bias_file, couche->nb_bias, couche->bias);
-
-    // printf("Matrix of bias:\n");
-    // print_double_matrix(couche->bias, couche->nb_bias);
+    couche->bias = (double *)malloc(couche->nb_neurons * couche->nb_bias * sizeof(double));
+    
+    read_file(bias_file, couche->nb_neurons, couche->nb_bias, couche->bias);
     
     free(weights_filename);
     free(bias_filename);
@@ -261,54 +283,54 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
 }
 
 void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas) {
-    FILE *inter_file;
+    // FILE *inter_file;
 
-    int nb_lines = 0;
+    // int nb_lines = 0;
 
-    inter_file = fopen("../Parametres/inter1.txt", "r");
+    // inter_file = fopen("../Parametres/inter1.txt", "r");
 
-    if (inter_file == NULL) {
-        perror("Erreur d'ouverture du fichier");
-        return;
-    }
+    // if (inter_file == NULL) {
+    //     perror("Erreur d'ouverture du fichier");
+    //     return;
+    // }
 
-    nb_lines = calcul_nb_ligne(inter_file);
+    // nb_lines = calcul_nb_line(inter_file);
 
-    if (nb_lines == 0) {
-        printf("Void file\n");
-        return;
-    }
-    else
-    {
-        printf("Number of lines : %d\n", nb_lines);
-    }
+    // if (nb_lines == 0) {
+    //     printf("Void file\n");
+    //     return;
+    // }
+    // else
+    // {
+    //     printf("Number of lines : %d\n", nb_lines);
+    // }
 
-    double* inter_value = (double *)malloc(nb_lines * sizeof(double));
+    // double* inter_value = (double *)malloc(nb_lines * sizeof(double));
 
-    read_file(inter_file, nb_lines, inter_value);
+    // read_file(inter_file, nb_lines, inter_value);
 
-    // printf("Matrix of inter value:\n");
-    // print_float_matrix(nb_lines, inter_value);
+    // // printf("Matrix of inter value:\n");
+    // // print_float_matrix(nb_lines, inter_value);
 
-    int nb_cases = 0;
-    int res = 0;
-    for (int neuron=0; neuron<32; neuron++)
-    {
-        for (int ligne=0; ligne<26; ligne++)
-        {
-            for (int colonne=0; colonne<26; colonne++)
-            {
-            printf("Result neuron %d, case %d : %.20f\n", neuron, ligne+colonne, Conv2D_1_datas[neuron][ligne][colonne]);
-            nb_cases++;
-            }
-        }
-    }
-    printf("Results : %d/%d\n", res, nb_cases);
+    // int nb_cases = 0;
+    // int res = 0;
+    // for (int neuron=0; neuron<32; neuron++)
+    // {
+    //     for (int ligne=0; ligne<26; ligne++)
+    //     {
+    //         for (int colonne=0; colonne<26; colonne++)
+    //         {
+    //         printf("Result neuron %d, case %d : %.20f\n", neuron, ligne+colonne, Conv2D_1_datas[neuron][ligne][colonne]);
+    //         nb_cases++;
+    //         }
+    //     }
+    // }
+    // printf("Results : %d/%d\n", res, nb_cases);
         
 
-    // Check();
+    // // Check();
 
-    fclose(inter_file);
+    // fclose(inter_file);
 }
 
 void MaxPooling2D(double*** Conv2D_datas, Maxpool_t max_pool_shape, double*** Max_Pool_datas)

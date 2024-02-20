@@ -56,8 +56,9 @@ typedef struct
 } Maxpool_t;
 
 void print_double_matrix(double* matrix, int taille);
-int calcul_nb_ligne(FILE *file);
-void read_file(FILE *file, int nb_lines, double* texte);
+int calcul_nb_line(FILE *file);
+int calcul_nb_values_per_line(FILE *file);
+void read_file(FILE *file, int nb_lines, int nb_values_per_line, double* texte);
 void import_couche(Couche_t* couche, int i);
 void import_model(Model_t* model);
 
