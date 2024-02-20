@@ -229,6 +229,8 @@ void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Co
     }
 }
 
+
+
 void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas) {
     FILE *inter_file;
 
@@ -244,7 +246,11 @@ void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, doubl
     nb_lines = calcul_nb_ligne(inter_file);
 
     if (nb_lines == 0) {
+<<<<<<< HEAD
+        printf("Void file\n");
+=======
         printf("Void file \n");
+>>>>>>> a0ce32b6107fb864057157f216ce45c1bf6a4edc
         return;
     }
     else
@@ -252,14 +258,30 @@ void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, doubl
         printf("Number of lines : %d\n", nb_lines);
     }
 
-    double* inter_value = (double *)malloc(couche->nb_weights * sizeof(double));
+    double* inter_value = (double *)malloc(nb_lines * sizeof(double));
 
     read_file(inter_file, nb_lines, inter_value);
 
-    printf("Matrix of inter value:\n");
+    // printf("Matrix of inter value:\n");
     // print_float_matrix(nb_lines, inter_value);
 
     Conv2D(pBitmap, Conv2D_shape, couche, Conv2D_1_datas);
+
+    int nb_cases = 0;
+    int res = 0;
+    for (int neuron=0; neuron<32; neuron++)
+    {
+        for (int ligne=0; ligne<26; ligne++)
+        {
+            for (int colonne=0; colonne<26; colonne++)
+            {
+            printf("Result neuron %d, case %d : %.20f\n", neuron, ligne+colonne, Conv2D_1_datas[neuron][ligne][colonne]);
+            nb_cases++;
+            }
+        }
+    }
+    printf("Results : %d/%d\n", res, nb_cases);
+        
 
     // Check();
 
