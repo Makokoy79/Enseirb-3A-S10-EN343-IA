@@ -77,6 +77,8 @@ int main(int argc, char* argv[]){
 
 printf("Importation du modèle\n");
   import_model(&Neural_net);
+  printf("Poids 0: %.20f\n", Neural_net.couches[1].weights[0]);
+  printf("Poids 1: %.20f\n", Neural_net.couches[1].weights[1]);
 printf("Importation du modèle OK\n");
 
   /********** Rémy : Calcul  **********/
