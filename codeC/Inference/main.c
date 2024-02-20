@@ -17,15 +17,61 @@ Pour exécuter, tapez : ./all
 #include "Bmp2Matrix.h"
 #include "couche.h"
 
-
-
 int main(int argc, char* argv[]){
 
   /********** Lilian : Import of the model with weights and biais **********/
 
+
   Model_t Neural_net;
   Neural_net.nb_couche = 6;
   Neural_net.couches = (Couche_t *)malloc(Neural_net.nb_couche * sizeof(Couche_t));
+
+// "Couche 0" => Image d'entrée
+  Neural_net.couches[0].nb_neurons = 1;
+  Neural_net.couches[0].nb_weights = 0;
+  Neural_net.couches[0].nb_bias = 0;
+  Neural_net.couches[0].lines = 28;
+  Neural_net.couches[0].columns = 28;
+// Couche 1 => Convolution 2D
+  Neural_net.couches[1].nb_neurons = 32;
+  Neural_net.couches[1].nb_weights = 0;
+  Neural_net.couches[1].nb_bias = 0;
+  Neural_net.couches[1].kernel[0] = 3;
+  Neural_net.couches[1].kernel[1] = 3;
+  Neural_net.couches[1].lines = Neural_net.couches[0].lines-Neural_net.couches[1].kernel[0]+1;
+  Neural_net.couches[1].columns = Neural_net.couches[0].columns-Neural_net.couches[1].kernel[1]+1;
+  Neural_net.couches[1].activation = 'R';
+// Couche 2 => Max Pooling
+  Neural_net.couches[2].nb_neurons = Neural_net.couches[1].nb_neurons;
+  Neural_net.couches[2].nb_weights = 0;
+  Neural_net.couches[2].nb_bias = 0;
+  Neural_net.couches[2].kernel[0] = 2;
+  Neural_net.couches[2].kernel[1] = 2;
+  Neural_net.couches[2].lines = Neural_net.couches[1].lines/Neural_net.couches[2].kernel[0];
+  Neural_net.couches[2].columns = Neural_net.couches[1].columns/Neural_net.couches[2].kernel[1];
+// Couche 3 => Convolution 2D
+  Neural_net.couches[3].nb_neurons = 64;
+  Neural_net.couches[3].nb_weights = 0;
+  Neural_net.couches[3].nb_bias = 0;
+  Neural_net.couches[3].kernel[0] = 3;
+  Neural_net.couches[3].kernel[1] = 3;
+  Neural_net.couches[3].lines = Neural_net.couches[2].lines-Neural_net.couches[3].kernel[0]+1;
+  Neural_net.couches[3].columns = Neural_net.couches[2].columns-Neural_net.couches[3].kernel[1]+1;
+  Neural_net.couches[3].activation = 'R';
+// Couche 4 => Max Pooling
+  Neural_net.couches[4].nb_neurons = Neural_net.couches[2].nb_neurons;
+  Neural_net.couches[4].nb_weights = 0;
+  Neural_net.couches[4].nb_bias = 0;
+  Neural_net.couches[4].kernel[0] = 2;
+  Neural_net.couches[4].kernel[1] = 2;
+  Neural_net.couches[4].lines = Neural_net.couches[3].lines/Neural_net.couches[4].kernel[0];
+  Neural_net.couches[4].columns = Neural_net.couches[3].columns/Neural_net.couches[4].kernel[1];
+// Couche 5 => Flatten
+  Neural_net.couches[5].nb_neurons = 1;
+  Neural_net.couches[5].lines = Neural_net.couches[5].nb_neurons;
+// Couche 6 => Dense
+  Neural_net.couches[6].nb_neurons = Neural_net.couches[5].nb_neurons;
+  Neural_net.couches[6].lines = Neural_net.couches[6].nb_neurons;
 
   import_model(&Neural_net);
 
@@ -45,10 +91,10 @@ int main(int argc, char* argv[]){
   ConvertRGB2Gray(&bitmap);
 
 /*      keras.Input(shape=input_shape),
-        layers.Conv2D(32, kernel_size=(3, 3), activation="relu"),
-        layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Conv2D(64, kernel_size=(3, 3), activation="relu"),
-        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Conv2D(32, kernel=(3, 3), activation="relu"),
+        layers.MaxPooling2D(pool=(2, 2)),
+        layers.Conv2D(64, kernel=(3, 3), activation="relu"),
+        layers.MaxPooling2D(pool=(2, 2)),
         layers.Flatten(),
         layers.Dense(test_nb, activation="softmax"), */
 
@@ -56,8 +102,8 @@ int main(int argc, char* argv[]){
   //Convolution 2D
   Conv2D_t Conv2D_1;
   Conv2D_1.nb = 32;
-  Conv2D_1.kernel_size[0] = 3;
-  Conv2D_1.kernel_size[1] = 3;
+  Conv2D_1.kernel[0] = 3;
+  Conv2D_1.kernel[1] = 3;
   Conv2D_1.activation = 'r';
 
     // Allocation de mémoire pour le résultat de la convolution 2D numéro 1
@@ -74,8 +120,12 @@ int main(int argc, char* argv[]){
 
   
   /* Couche 1 */
+  printf("Traitement couche 1 : Convolution 2D\n");
   Conv2D(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
+  printf("Fin de traitement couche 1 : Convolution 2D\n");
 
+  // Affichage des résultats de la couche 1 (Convolution 2D)
+/*
   int nb_cases = 0;
   for (int neuron=0; neuron<32; neuron++)
   {
@@ -88,15 +138,16 @@ int main(int argc, char* argv[]){
         }
       }
   }
+*/
   // printf("Nombre de valeurs : %d\n", nb_cases);
 
   //Max Pooling
   Maxpool_t Max_pooling_1;
   Max_pooling_1.nb = Conv2D_1.nb;
-  Max_pooling_1.kernel_size[0] = 2;
-  Max_pooling_1.kernel_size[1] = 2;
-  Max_pooling_1.lines = 26/Max_pooling_1.kernel_size[0];
-  Max_pooling_1.columns = 26/Max_pooling_1.kernel_size[1];  
+  Max_pooling_1.kernel[0] = 2;
+  Max_pooling_1.kernel[1] = 2;
+  Max_pooling_1.lines = 26/Max_pooling_1.kernel[0];
+  Max_pooling_1.columns = 26/Max_pooling_1.kernel[1];  
 
   // Allocation de mémoire pour le résultat du max_poolong 1
   double*** max_pooling_1_datas = (double***)malloc(Conv2D_1.nb * sizeof(double**));
@@ -108,21 +159,14 @@ int main(int argc, char* argv[]){
   }
 
   /* Debug couche 1 */
-  printf("Debug couche 1 : Conv2D(32, kernel_size=(3, 3), activation=relu)\n");
-  debug_couche1(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
+  // printf("Debug couche 1 : Conv2D(32, kernel=(3, 3), activation=relu)\n");
+  // debug_couche1(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
 
 
   //Max_pooling
+  printf("Traitement couche 2 : Max_pooling\n");
   MaxPooling2D(Conv2D_1_datas, Max_pooling_1, max_pooling_1_datas);
-
-
-  // Libérer la mémoire des données d'entrée de la fonction précédente
-      for (int i = 0; i < Conv2D_1.nb; i++) {
-        for (int j = 0; j < bitmap.infoHeader.xResolution; j++) {
-            free(Conv2D_1_datas[i][j]);
-        }
-        free(Conv2D_1_datas[i]);
-    }
+  printf("Fin de traitement couche 2 : Max_pooling\n");
 
     // Libérer Conv2D_1_datas
     for (int i = 0; i < Conv2D_1.nb; ++i) {
@@ -132,6 +176,8 @@ int main(int argc, char* argv[]){
         free(Conv2D_1_datas[i]);
     }
     free(Conv2D_1_datas);
+
+  printf("Libération de la mémoire de la couche convolutive 1 ==> OK\n");
 
   //Convolution 2D
     //TODO
@@ -152,9 +198,12 @@ int main(int argc, char* argv[]){
       free(Neural_net.couches[i].bias);
   }
   free(Neural_net.couches);
-  
+
+  printf("Libération de la mémoire des paramètres ==> OK\n");
+
   DesallouerBMP(&bitmap);
 
+  printf("Libération de la mémoire de l'image d'entrée ==> OK\n");
 
 
 
