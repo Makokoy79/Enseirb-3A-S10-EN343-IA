@@ -268,7 +268,7 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
                 {
                     for (int window_y = 0; window_y<couche_out->kernel[1]; window_y++)
                     {
-                        couche_out->data[neuron][line][column] += (couche_in->data[0][line+window_x][column+window_y])*(couche_out->weights[neuron+window_x+window_y]);
+                        couche_out->data[neuron][line][column] += ((couche_in->data[0][line+window_x][column+window_y])/255)*(couche_out->weights[neuron+window_x+window_y]);
                     }
                 }
                 (couche_out->data[neuron][line][column] += couche_out->bias[neuron]);
