@@ -213,16 +213,19 @@ void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Co
             for (int column = 0; column<(pBitmap->infoHeader.hauteur-Conv2D_shape->kernel_size[1]+1); column++)
             {
                 Conv2D_1_datas[neuron][line][column] = 0;
-                //double add_pixels = 0;
                 for (int window_x = 0; window_x<Conv2D_shape->kernel_size[0]; window_x++)
                 {
                     for (int window_y = 0; window_y<Conv2D_shape->kernel_size[1]; window_y++)
                     {
                         Conv2D_1_datas[neuron][line][column] += (pBitmap->mPixelsGray[line+window_x][column+window_y])*(couche->weights[neuron+window_x+window_y]);
                     }
-                    //add_pixels += Conv2D_shape->kernel_size[0]*Conv2D_shape->kernel_size[1];
                 }
-                Conv2D_1_datas[neuron][line][column] += couche->bias[neuron];
+                (Conv2D_1_datas[neuron][line][column] += couche->bias[neuron]);
+                // Fonction d'activation RELU
+                if (Conv2D_1_datas[neuron][line][column]< 0)
+                {
+                    Conv2D_1_datas[neuron][line][column] = 0;
+                }
             }
         }
     }
@@ -274,11 +277,14 @@ void MaxPooling2D(double*** Conv2D_datas, Maxpool_t max_pool_shape, double*** Ma
             for (int column=0; line<max_pool_shape.columns; column++)
             {
                 double max = Conv2D_datas[neuron][line*max_pool_shape.kernel_size[0]][column*max_pool_shape.kernel_size[1]];
-                for (int window_x=1; window_x<max_pool_shape.kernel_size[0]; window_x++)
+                for (int window_x=0; window_x<max_pool_shape.kernel_size[0]; window_x++)
                 {
                     for (int window_y=0; window_y<max_pool_shape.kernel_size[1]; window_y++)
                     {
-                        if (Conv2D_datas[neuron][(line*max_pool_shape.kernel_size[0])+window_x][(column*max_pool_shape.kernel_size[1])+window_y] > max)
+                        if (window_x==0 && window_y==0)
+                        {
+                            max = Conv2D_datas[neuron][(line*max_pool_shape.kernel_size[0])][(column*max_pool_shape.kernel_size[1])];
+                        }else if (Conv2D_datas[neuron][(line*max_pool_shape.kernel_size[0])+window_x][(column*max_pool_shape.kernel_size[1])+window_y] > max)
                         {
                             max = Conv2D_datas[neuron][(line*max_pool_shape.kernel_size[0])+window_x][(column*max_pool_shape.kernel_size[1])+window_y];
                         }
