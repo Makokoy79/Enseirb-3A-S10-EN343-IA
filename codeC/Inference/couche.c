@@ -200,6 +200,7 @@ double conv_unit(double *pixels, int nb_pixels, double weight, double bias)
     return (conv)/nb_pixels+bias; // Biais du neurone
 }
 
+/* // Convolution 2D initiale
 void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas) {
     //Pour chaque neurone à traiter
     for (int neuron = 0; neuron<Conv2D_shape->nb; neuron++)
@@ -228,8 +229,36 @@ void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Co
         }
     }
 }
+*/
 
-
+void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
+    //Pour chaque neurone à traiter
+    for (int neuron = 0; neuron<couche_out->nb_neurons; neuron++)
+    {
+        // Pour chaque ligne de la donnée d'entrée
+        for (int line = 0; line<(couche_in->lines-couche_out->kernel[0]+1); line++)
+        {
+            // Et pour chaque colonne de la données d'entrée
+            for (int column = 0; column<(couche_in->columns-couche_out->kernel[1]+1); column++)
+            {
+                couche_out->data[neuron][line][column] = 0;
+                for (int window_x = 0; window_x<couche_out->kernel[0]; window_x++)
+                {
+                    for (int window_y = 0; window_y<couche_out->kernel[1]; window_y++)
+                    {
+                        couche_out->data[neuron][line][column] += (couche_in->data[0][line+window_x][column+window_y])*(couche_out->weights[neuron+window_x+window_y]);
+                    }
+                }
+                (couche_out->data[neuron][line][column] += couche_out->bias[neuron]);
+                // Fonction d'activation RELU
+                if (couche_out->data[neuron][line][column]< 0)
+                {
+                    couche_out->data[neuron][line][column] = 0;
+                }
+            }
+        }
+    }
+}
 
 void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas) {
     FILE *inter_file;
@@ -246,11 +275,7 @@ void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, doubl
     nb_lines = calcul_nb_ligne(inter_file);
 
     if (nb_lines == 0) {
-<<<<<<< HEAD
         printf("Void file\n");
-=======
-        printf("Void file \n");
->>>>>>> a0ce32b6107fb864057157f216ce45c1bf6a4edc
         return;
     }
     else
@@ -264,8 +289,6 @@ void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, doubl
 
     // printf("Matrix of inter value:\n");
     // print_float_matrix(nb_lines, inter_value);
-
-    Conv2D(pBitmap, Conv2D_shape, couche, Conv2D_1_datas);
 
     int nb_cases = 0;
     int res = 0;
