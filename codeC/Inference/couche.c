@@ -176,9 +176,9 @@ void import_model(Model_t* model) {
             // calculer le nombre de lignes
             // stocker les lignes dans un tableau
 
-    for (int i = 0; i < model->nb_couche; i++)
+    for (int i = 1; i < model->nb_couche; i++)
     {
-        import_couche(&model->couches[i], i+1);
+        import_couche(&model->couches[i], i);
         // printf("\n");
         // printf("Weights\n");
         // print_double_matrix(model->couches->weights, model->couches->nb_weights);
@@ -189,8 +189,6 @@ void import_model(Model_t* model) {
     }
     
 }
-
-
 
 double conv_unit(double *pixels, int nb_pixels, double weight, double bias)
 {
@@ -207,15 +205,15 @@ void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Co
     for (int neuron = 0; neuron<Conv2D_shape->nb; neuron++)
     {
         // Pour chaque ligne de la donnée d'entrée
-        for (int line = 0; line<(pBitmap->infoHeader.largeur-Conv2D_shape->kernel_size[0]+1); line++)
+        for (int line = 0; line<(pBitmap->infoHeader.largeur-Conv2D_shape->kernel[0]+1); line++)
         {
             // Et pour chaque colonne de la données d'entrée
-            for (int column = 0; column<(pBitmap->infoHeader.hauteur-Conv2D_shape->kernel_size[1]+1); column++)
+            for (int column = 0; column<(pBitmap->infoHeader.hauteur-Conv2D_shape->kernel[1]+1); column++)
             {
                 Conv2D_1_datas[neuron][line][column] = 0;
-                for (int window_x = 0; window_x<Conv2D_shape->kernel_size[0]; window_x++)
+                for (int window_x = 0; window_x<Conv2D_shape->kernel[0]; window_x++)
                 {
-                    for (int window_y = 0; window_y<Conv2D_shape->kernel_size[1]; window_y++)
+                    for (int window_y = 0; window_y<Conv2D_shape->kernel[1]; window_y++)
                     {
                         Conv2D_1_datas[neuron][line][column] += (pBitmap->mPixelsGray[line+window_x][column+window_y])*(couche->weights[neuron+window_x+window_y]);
                     }
@@ -296,23 +294,52 @@ void MaxPooling2D(double*** Conv2D_datas, Maxpool_t max_pool_shape, double*** Ma
     {
         for (int line=0; line<max_pool_shape.lines; line++)
         {
-            for (int column=0; line<max_pool_shape.columns; column++)
+            for (int column=0; column<max_pool_shape.columns; column++)
             {
-                double max = Conv2D_datas[neuron][line*max_pool_shape.kernel_size[0]][column*max_pool_shape.kernel_size[1]];
-                for (int window_x=0; window_x<max_pool_shape.kernel_size[0]; window_x++)
+                double max = Conv2D_datas[neuron][line*max_pool_shape.kernel[0]][column*max_pool_shape.kernel[1]];
+                for (int window_x=0; window_x<max_pool_shape.kernel[0]; window_x++)
                 {
-                    for (int window_y=0; window_y<max_pool_shape.kernel_size[1]; window_y++)
+                    for (int window_y=0; window_y<max_pool_shape.kernel[1]; window_y++)
                     {
                         if (window_x==0 && window_y==0)
                         {
-                            max = Conv2D_datas[neuron][(line*max_pool_shape.kernel_size[0])][(column*max_pool_shape.kernel_size[1])];
-                        }else if (Conv2D_datas[neuron][(line*max_pool_shape.kernel_size[0])+window_x][(column*max_pool_shape.kernel_size[1])+window_y] > max)
+                            max = Conv2D_datas[neuron][(line*max_pool_shape.kernel[0])][(column*max_pool_shape.kernel[1])];
+                        }else if (Conv2D_datas[neuron][(line*max_pool_shape.kernel[0])+window_x][(column*max_pool_shape.kernel[1])+window_y] > max)
                         {
-                            max = Conv2D_datas[neuron][(line*max_pool_shape.kernel_size[0])+window_x][(column*max_pool_shape.kernel_size[1])+window_y];
+                            max = Conv2D_datas[neuron][(line*max_pool_shape.kernel[0])+window_x][(column*max_pool_shape.kernel[1])+window_y];
                         }
                     }
                 }
-                Max_Pool_datas[neuron][line/max_pool_shape.kernel_size[0]][column/max_pool_shape.kernel_size[1]] = max;
+                Max_Pool_datas[neuron][line/max_pool_shape.kernel[0]][column/max_pool_shape.kernel[1]] = max;
+            }
+        }
+    }
+}
+
+void Conv2D_2(double*** Max_Pool_datas, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas) {
+    //Pour chaque neurone à traiter
+    for (int neuron = 0; neuron<Conv2D_shape->nb; neuron++)
+    {
+        // Pour chaque ligne de la donnée d'entrée
+        for (int line = 0; line<13; line++)
+        {
+            // Et pour chaque colonne de la données d'entrée
+            for (int column = 0; column<13; column++)
+            {
+                Conv2D_1_datas[neuron][line][column] = 0;
+                for (int window_x = 0; window_x<Conv2D_shape->kernel[0]; window_x++)
+                {
+                    for (int window_y = 0; window_y<Conv2D_shape->kernel[1]; window_y++)
+                    {
+                        Conv2D_1_datas[neuron][line][column] += (Max_Pool_datas[neuron][line+window_x][column+window_y])*(couche->weights[neuron+window_x+window_y]);
+                    }
+                }
+                (Conv2D_1_datas[neuron][line][column] += couche->bias[neuron]);
+                // Fonction d'activation RELU
+                if (Conv2D_1_datas[neuron][line][column]< 0)
+                {
+                    Conv2D_1_datas[neuron][line][column] = 0;
+                }
             }
         }
     }

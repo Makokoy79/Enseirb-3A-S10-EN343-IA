@@ -1,1 +1,4 @@
 *.o
+SSHkey.txt
+SSHkey.txt.pub
+all
