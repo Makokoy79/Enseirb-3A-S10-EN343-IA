@@ -115,9 +115,6 @@ int main(int argc, char* argv[]){
 
   import_model(&Neural_net);
 
-  printf("Poids 0: %.20f\n", Neural_net.couches[1].weights[0]);
-  printf("Poids 1: %.20f\n", Neural_net.couches[1].weights[1]);
-  printf("Poids 9: %.20f\n", Neural_net.couches[1].weights[9]);
   printf("Importation du modèle OK\n");
 
 
@@ -140,6 +137,14 @@ int main(int argc, char* argv[]){
   Conv2D(&Neural_net.couches[0], &Neural_net.couches[1]);
   printf("Fin de traitement couche 1 : Convolution 2D\n");
 
+  /* Debug couche 1 */
+  printf("Result neuron %d, case %d : %.20f\n", 1, 4, Neural_net.couches[1].data[1][0][3]);
+  printf("Result neuron %d, case %d : %.20f\n", 7, 1, Neural_net.couches[1].data[7][0][0]);
+  printf("Result neuron %d, case %d : %.20f\n", 15, 1, Neural_net.couches[1].data[15][0][0]);
+  // printf("Debug couche 1 : Conv2D(32, kernel=(3, 3), activation=relu)\n");
+  // debug_couche1(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
+
+
   // Affichage des résultats de la couche 1 (Convolution 2D)
 /* 
   int nb_cases = 0;
@@ -158,11 +163,6 @@ int main(int argc, char* argv[]){
    */
 
   //Max Pooling
-
-  /* Debug couche 1 */
-  // printf("Debug couche 1 : Conv2D(32, kernel=(3, 3), activation=relu)\n");
-  // debug_couche1(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
-
 
   //Max_pooling
   printf("Fin de traitement couche 2 : Max_pooling\n");
