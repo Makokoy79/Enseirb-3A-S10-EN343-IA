@@ -74,7 +74,7 @@ int main(int argc, char* argv[]){
 
   
   /* Couche 1 */
-  Conv2D(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
+  // Conv2D(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
 
   /* Debug couche 1 */
   printf("Debug couche 1 : Conv2D(32, kernel_size=(3, 3), activation=relu)\n");
