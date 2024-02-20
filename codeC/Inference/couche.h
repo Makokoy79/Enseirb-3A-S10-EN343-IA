@@ -29,7 +29,7 @@ typedef struct
     int nb_bias;        // un nombre de biais
     double* weights;    // Un tableau de poids
     double* bias;       // Un tableau de biais
-    double*** data;     // Des données de sortie ==> A definir
+    double*** data;     // Des données de sortie ==> Réserver espace mémoire !!!
     int kernel[2];      // Un "Kernel" (fenêtre de traitement)
     char activation;    // Une fonction d'activation
 } Couche_t;
@@ -66,7 +66,8 @@ double conv_unit(double *pixels, int nb_pixels, double weight, double bias);
 
 // void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas);
 void Conv2D(Couche_t* couche_in, Couche_t* couche_out);
-void MaxPooling2D(double*** Conv2D_datas, Maxpool_t max_pool_shape, double*** Max_Pool_datas);
+//void MaxPooling2D(double*** Conv2D_datas, Maxpool_t max_pool_shape, double*** Max_Pool_datas);
+void MaxPooling2D(Couche_t* couche_in, Couche_t* couche_out);
 void Conv2D_2(double*** Max_Pool_datas, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas);
 
 void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas);

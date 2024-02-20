@@ -333,7 +333,7 @@ void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, doubl
     // fclose(inter_file);
 }
 
-void MaxPooling2D(double*** Conv2D_datas, Maxpool_t max_pool_shape, double*** Max_Pool_datas)
+/* void MaxPooling2D(double*** Conv2D_datas, Maxpool_t max_pool_shape, double*** Max_Pool_datas)
 {
     for (int neuron = 0; neuron<max_pool_shape.nb; neuron++)
     {
@@ -356,6 +356,34 @@ void MaxPooling2D(double*** Conv2D_datas, Maxpool_t max_pool_shape, double*** Ma
                     }
                 }
                 Max_Pool_datas[neuron][line/max_pool_shape.kernel[0]][column/max_pool_shape.kernel[1]] = max;
+            }
+        }
+    }
+} */
+
+void MaxPooling2D(Couche_t* couche_in, Couche_t* couche_out)
+{
+    for (int neuron = 0; neuron<couche_out->nb_neurons; neuron++)
+    {
+        for (int line=0; line<couche_out->lines; line++)
+        {
+            for (int column=0; column<couche_out->columns; column++)
+            {
+                double max = couche_in->data[neuron][line*couche_out->kernel[0]][column*couche_out->kernel[1]];
+                for (int window_x=0; window_x<couche_out->kernel[0]; window_x++)
+                {
+                    for (int window_y=0; window_y<couche_out->kernel[1]; window_y++)
+                    {
+                        if (window_x==0 && window_y==0)
+                        {
+                            max = couche_in->data[neuron][(line*couche_out->kernel[0])][(column*couche_out->kernel[1])];
+                        }else if (couche_in->data[neuron][(line*couche_out->kernel[0])+window_x][(column*couche_out->kernel[1])+window_y] > max)
+                        {
+                            max = couche_in->data[neuron][(line*couche_out->kernel[0])+window_x][(column*couche_out->kernel[1])+window_y];
+                        }
+                    }
+                }
+                couche_out->data[neuron][line/couche_out->kernel[0]][column/couche_out->kernel[1]] = max;
             }
         }
     }
