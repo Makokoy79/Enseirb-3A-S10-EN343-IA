@@ -141,7 +141,7 @@ void import_couche(Couche_t* couche, int i) {
     nb_lines = calcul_nb_line(weights_file);
 
     couche->nb_weights = calcul_nb_values_per_line(weights_file);
-    printf("Number of weights per layer %d\n", couche->nb_weights);
+    printf("Number of weights per neuron %d\n", couche->nb_weights);
 
     if (nb_lines == 0) {
         printf("No neurons in layer %d\n", i);
@@ -169,7 +169,7 @@ void import_couche(Couche_t* couche, int i) {
     nb_lines = calcul_nb_line(bias_file);
 
     couche->nb_bias = calcul_nb_values_per_line(bias_file);
-    printf("Number of bias per layer %d\n", couche->nb_bias);
+    printf("Number of bias per neuron %d\n", couche->nb_bias);
 
     if (nb_lines != couche->nb_neurons) {
         printf("Error, not the same number of neurons in weight and bias files\n");
