@@ -40,7 +40,7 @@ int calcul_nb_line(FILE *file) {
     // Rembobiner le fichier
     rewind(file);
 
-    // printf("Number of lines: %d\n", nb_lines);
+    //printf("Number of lines: %d\n", nb_lines);
     return nb_lines;
 }
 
@@ -212,34 +212,22 @@ void import_model(Model_t* model) {
     
 }
 
-double conv_unit(double *pixels, int nb_pixels, double weight, double bias)
-{
-    double conv = 0;
-    for (int i=0; i<nb_pixels; i++)
-    {
-        conv += pixels[i];//*poids en cours
-    }
-    return (conv)/nb_pixels+bias; // Biais du neurone
-}
-
 void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
     //Pour chaque neurone à traiter
     for (int neuron = 0; neuron<couche_out->nb_neurons; neuron++)
     {
         // Pour chaque ligne de la donnée d'entrée
-        for (int line = 0; line<(couche_in->lines-couche_out->kernel[0]+1); line++)
+        for (int line = 0; line<(couche_out->lines); line++)
         {
             // Et pour chaque colonne de la données d'entrée
-            for (int column = 0; column<(couche_in->columns-couche_out->kernel[1]+1); column++)
+            for (int column = 0; column<(couche_out->columns); column++)
             {
-                couche_out->data[neuron][line][column] = 0;
                 for (int window_x = 0; window_x<couche_out->kernel[0]; window_x++)
                 {
                     for (int window_y = 0; window_y<couche_out->kernel[1]; window_y++)
                     {
-                        // A revoir
-                        int weight = couche_out->weights[neuron*couche_out->nb_neurons + window_x*couche_out->kernel[0]+window_y];
-                        couche_out->data[neuron][line][column] += (couche_in->data[0][line+window_x*couche_out->kernel[0]][column+window_y])*weight;
+                        double weight = couche_out->weights[neuron*couche_out->nb_weights + window_x*couche_out->kernel[0]+window_y];
+                        couche_out->data[neuron][line][column] += (couche_in->data[0][line+window_x][column+window_y])*weight;
                     }
                 }
                 (couche_out->data[neuron][line][column] += couche_out->bias[neuron]);

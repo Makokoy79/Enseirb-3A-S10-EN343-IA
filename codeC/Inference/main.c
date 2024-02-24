@@ -24,13 +24,27 @@ int main(int argc, char* argv[]){
 
   pFichier=fopen("../Lecture/0_20.bmp", "rb");     //Ouverture du fichier contenant l'image
   if (pFichier==NULL) {
-      printf("%s\n", "0_1.bmp");
+      printf("%s\n", "0_20.bmp");
       printf("Erreur dans la lecture du fichier\n");
   }
   LireBitmap(pFichier, &bitmap);
   fclose(pFichier);               //Fermeture du fichier contenant l'image
-
   ConvertRGB2Gray(&bitmap);
+
+  // Permet d'afficher les valeurs de chaque pixel de l'image importée.
+  // Pratique pour faire les calculs à la main et vérifier les résultats d'un traitement
+  // Pour debug seulement
+  /*
+  for (int line=0; line<bitmap.infoHeader.hauteur; line++)
+  {
+    for (int column=0; column<bitmap.infoHeader.largeur; column++)
+    {
+      printf("%d\t", bitmap.mPixelsGray[line][column]);
+    }
+    printf("\n");
+  }
+  */
+
   /********** Lilian : Import of the model with weights and biais **********/
 
   Model_t Neural_net;
@@ -38,6 +52,7 @@ int main(int argc, char* argv[]){
   Neural_net.couches = (Couche_t *)malloc(Neural_net.nb_couche * sizeof(Couche_t));
 
 // "Couche 0" => Image d'entrée
+// Couche vérifiée, les données de l'image à traiter ont bien été copiées dans la mémoire
   Neural_net.couches[0].nb_neurons = 1;
   Neural_net.couches[0].nb_weights = 0;
   Neural_net.couches[0].nb_bias = 0;
@@ -60,6 +75,9 @@ int main(int argc, char* argv[]){
     }
   }
   // Libérer bitmap
+  DesallouerBMP(&bitmap);
+
+
 // Couche 1 => Convolution 2D
   Neural_net.couches[1].nb_neurons = 32;
   Neural_net.couches[1].nb_weights = 0;
@@ -121,53 +139,40 @@ int main(int argc, char* argv[]){
 
   printf("Importation du modèle OK\n");
 
+  // Vérification que les poids sont bien importés
+  // Vérifié. Les poids sont importés correctement
+/*   printf("nombre de neurones : %d\n",Neural_net.couches[1].nb_neurons );
+  for (int neuron=0; neuron<Neural_net.couches[1].nb_neurons; neuron++)
+  {
+    printf("Neurone %d\t", neuron);
+    for (int weight=0; weight<Neural_net.couches[1].nb_weights; weight++)
+    {
+      printf("%f\t", Neural_net.couches[1].weights[neuron*Neural_net.couches[1].nb_weights+weight]);
+    }
+    printf("\n");
+  } */
 
   /********** Rémy : Calcul  **********/
 
-
-/*      keras.Input(shape=input_shape),
-        layers.Conv2D(32, kernel=(3, 3), activation="relu"),
-        layers.MaxPooling2D(pool=(2, 2)),
-        layers.Conv2D(64, kernel=(3, 3), activation="relu"),
-        layers.MaxPooling2D(pool=(2, 2)),
-        layers.Flatten(),
-        layers.Dense(test_nb, activation="softmax"), */
-
-  // printf("Taille de l'image chargée en x : [%d]\n", bitmap.infoHeader.largeur);
-
-
-  
   /* Couche 1 */
   Conv2D(&Neural_net.couches[0], &Neural_net.couches[1]);
   printf("Fin de traitement couche 1 : Convolution 2D\n");
 
+  // Vérification de la sortie de la convolution 2D pour le neurone x à saisir manuellement
+/*     int neuron = 0;
+    printf("Neuron n°%d : ", neuron);
+    for (int line=0; line<Neural_net.couches[1].lines; line++)
+    {
+      for (int column=0; column<Neural_net.couches[1].columns; column++)
+      {
+        printf("%f\t", Neural_net.couches[1].data[neuron][line][column]);
+      }
+      printf("\n");
+    } */
+
   /* Debug couche 1 */
-  printf("Result neuron %d, case %d : %.20f\n", 1, 4, Neural_net.couches[1].data[1][0][3]);
-  printf("Result neuron %d, case %d : %.20f\n", 7, 1, Neural_net.couches[1].data[7][0][0]);
-  printf("Result neuron %d, case %d : %.20f\n", 15, 1, Neural_net.couches[1].data[15][0][0]);
   // printf("Debug couche 1 : Conv2D(32, kernel=(3, 3), activation=relu)\n");
   // debug_couche1(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
-
-
-  // Affichage des résultats de la couche 1 (Convolution 2D)
-
-  int nb_cases = 0;
-  for (int neuron=0; neuron<32; neuron++)
-  {
-      for (int ligne=0; ligne<26; ligne++)
-      {
-        for (int colonne=0; colonne<26; colonne++)
-        {
-          printf("Result neuron %d, case %d : %.20f\n", neuron, (ligne*10)+colonne+1, Neural_net.couches[1].data[neuron][ligne][colonne]);
-          nb_cases++;
-        }
-      }
-  }
-  printf("Nombre de valeurs : %d\n", nb_cases);
-  printf("Result neuron %d, case %d : %.20f\n", 1, 4, Neural_net.couches[1].data[1][0][3]);
-  printf("Result neuron %d, case %d : %.20f\n", 7, 1, Neural_net.couches[1].data[7][0][0]);
-  printf("Result neuron %d, case %d : %.20f\n", 0, 1, Neural_net.couches[1].data[15][0][0]);
-
 
   //Max Pooling
 
