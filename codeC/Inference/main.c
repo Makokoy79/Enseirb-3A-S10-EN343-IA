@@ -60,7 +60,7 @@ int main(int argc, char* argv[]){
   Neural_net.couches[0].columns = bitmap.infoHeader.largeur;
   // Allocation de mémoire pour l'image
   Neural_net.couches[0].data = (double***)malloc(Neural_net.couches[0].nb_neurons * sizeof(double**));
-  for (int i = 0; i < Neural_net.couches[0].lines; ++i) {
+  for (int i = 0; i < Neural_net.couches[0].nb_neurons; ++i) {
       Neural_net.couches[0].data[i] = (double**)malloc(Neural_net.couches[0].lines * sizeof(double*));
       for (int j = 0; j < Neural_net.couches[0].lines; ++j) {
           Neural_net.couches[0].data[i][j] = (double*)malloc(Neural_net.couches[0].columns * sizeof(double));
@@ -298,34 +298,31 @@ printf("couche4 debut\n");
   printf("\nIl est écrit %d sur l'image traitée\n", result);
   
   /********** All free **********/
-
-  // Free model and couche
-  for (int i = 0; i < Neural_net.nb_couche; i++) {
-      free(Neural_net.couches[i].weights);
-      free(Neural_net.couches[i].bias);
-  }
-  free(Neural_net.couches);
+// Libération de la mémoire pour chaque couche
+for (int couche = 0; couche < Neural_net.nb_couche; couche++) {
+    // Pour chaque neurone dans la couche
+    for (int i = 0; i < Neural_net.couches[couche].nb_neurons; ++i) {
+        // Vérifie si les lignes ont été allouées
+        if (Neural_net.couches[couche].data[i] != NULL) {
+            // Pour chaque ligne dans le neurone
+            for (int j = 0; j < Neural_net.couches[couche].lines; ++j) {
+                // Libère la mémoire allouée pour chaque colonne dans la ligne)
+                free(Neural_net.couches[couche].data[i][j]);
+                Neural_net.couches[couche].data[i][j] = NULL;
+            }
+            // Libère la mémoire allouée pour les lignes du neurone
+            free(Neural_net.couches[couche].data[i]);
+            Neural_net.couches[couche].data[i] = NULL;
+        }
+    }
+    // Libère la mémoire allouée pour les neurones de la couche
+    free(Neural_net.couches[couche].data);
+}
+// Libère la mémoire allouée pour les couches du réseau
+free(Neural_net.couches);
 
   printf("Libération de la mémoire des paramètres ==> OK\n");
-
-  DesallouerBMP(&bitmap);
-
-  printf("Libération de la mémoire de l'image d'entrée ==> OK\n");
-
-
 
   return 0;
 }
 
-
-//  Fonction pour récupérer tout les paramètres du réseau
-//  Pour chaque couche : récupérer les poids et biais à parti des ".txt"
-//  Faire des malloc pour stocker les donées
-
-//  Application de chaque couche à partir  des paramètres
-//    Ecriture des fonctions correspondant à chaque couche
-//      Multiplication, Somme       => Convolution
-//      Comparaison                 => Max Pooling
-//       Fonction d'activation
-//       Mise à plat                => Flatten
-//    Ecriture des fonctions de comparaison de chaque couche afin de vérifier le résultat
