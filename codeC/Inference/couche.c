@@ -14,6 +14,8 @@ Pour exécuter, tapez : /
 
 #include "couche.h"
 
+#include <math.h>
+
 void print_double_matrix(double* matrix, int taille) {
     for (int i = 0; i < taille; i++) {
         printf("%f\t", matrix[i]);
@@ -381,5 +383,24 @@ void flatten(Couche_t* couche_in, Couche_t* couche_out)
                 couche_out->data[0][0][neuron*couche_in->lines*couche_in->columns+line*couche_in->columns+column] = couche_in->data[neuron][line][column];
             }
         }
+    }
+}
+
+void dense(Couche_t* couche_in, Couche_t* couche_out)
+{
+    double somme = 0.0;
+    for (int classe=0; classe<couche_out->columns; classe++)
+    {
+        couche_out->data[0][0][classe] = 0;
+        for (int entree=0; entree<couche_in->columns; entree++)
+        {
+            couche_out->data[0][0][classe] += couche_in->data[0][0][entree] * couche_out->weights[classe*couche_out->columns+entree];
+        }
+        couche_out->data[0][0][classe] += couche_out->bias[classe];
+        somme += couche_out->data[0][0][classe];        
+    }
+    for (int sortie=0; sortie<couche_out->columns; sortie++)
+    {
+        couche_out->data[0][0][sortie] /= somme;
     }
 }

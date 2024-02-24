@@ -168,8 +168,17 @@ printf("couche4 debut\n");
 
 // Couche 6 => Dense
   Neural_net.couches[6].nb_neurons = Neural_net.couches[5].nb_neurons;
-  Neural_net.couches[6].lines = Neural_net.couches[6].nb_neurons;
+  Neural_net.couches[6].lines = Neural_net.couches[5].lines;
   Neural_net.couches[6].columns = 10;
+  // Allocation de mémoire pour le résultat du flatten
+  Neural_net.couches[6].data = (double***)malloc(Neural_net.couches[6].nb_neurons * sizeof(double**));
+  for (int i = 0; i < Neural_net.couches[6].nb_neurons; ++i)
+  {
+      Neural_net.couches[6].data[i] = (double**)malloc(Neural_net.couches[6].lines * sizeof(double*));
+      for (int j = 0; j < Neural_net.couches[6].lines; ++j) {
+          Neural_net.couches[6].data[i][j] = (double*)malloc(Neural_net.couches[6].columns * sizeof(double));
+      }
+  }
 
   import_model(&Neural_net);
   printf("Importation du modèle OK\n");
@@ -250,7 +259,7 @@ printf("couche4 debut\n");
   MaxPooling2D(&Neural_net.couches[3], &Neural_net.couches[4]);
   printf("Fin de traitement couche 4 : Max_pooling\n");
   // Vérification de la sortie du max pooling pour le neurone x à saisir manuellement
-
+/*
   int neuron = 45;
   printf("Neurone n°%d : \n", neuron);
   for (int line=0; line<Neural_net.couches[4].lines; line++)
@@ -261,15 +270,32 @@ printf("couche4 debut\n");
     }
     printf("\n");
   }
-
+*/
 
   // Flatten
-    //TODO
+  flatten(&Neural_net.couches[4], &Neural_net.couches[5]);
+  printf("Fin de traitement couche 5 : Flatten\n");
 
   // Dense
-    //TODO
+  dense(&Neural_net.couches[5], &Neural_net.couches[6]);
+  printf("Fin de traitement couche 6 : dense\n");
 
+  // Calcul du résultat
+  double max = 0;
+  int result = 0;
+  for (int classe=0; classe<Neural_net.couches[6].columns; classe++)
+  {
+    printf("Classe %d : %f\t", classe, Neural_net.couches[6].data[0][0][classe]);
+    if (classe == 0)
+    {
+      max = Neural_net.couches[6].data[0][0][classe];
+    }else if (Neural_net.couches[6].data[0][0][classe] > max){
+      max = Neural_net.couches[6].data[0][0][classe];
+      result = classe;
+    }
+  }
 
+  printf("\nIl est écrit %d sur l'image traitée\n", result);
   
   /********** All free **********/
 

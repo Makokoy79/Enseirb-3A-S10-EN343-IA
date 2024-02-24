@@ -68,6 +68,9 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out);
 void MaxPooling2D(Couche_t* couche_in, Couche_t* couche_out);
 
 void flatten(Couche_t* couche_in, Couche_t* couche_out);
+
+void dense(Couche_t* couche_in, Couche_t* couche_out);
+
 void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas);
 
 #endif
