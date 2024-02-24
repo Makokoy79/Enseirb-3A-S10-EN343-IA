@@ -370,30 +370,15 @@ void MaxPooling2D(Couche_t* couche_in, Couche_t* couche_out)
     }
 }
 
-void Conv2D_2(double*** Max_Pool_datas, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas) {
-    //Pour chaque neurone à traiter
-    for (int neuron = 0; neuron<Conv2D_shape->nb; neuron++)
+void flatten(Couche_t* couche_in, Couche_t* couche_out)
+{
+    for (int neuron=0; neuron<couche_in->nb_neurons; neuron++)
     {
-        // Pour chaque ligne de la donnée d'entrée
-        for (int line = 0; line<13; line++)
+        for (int line=0; line<couche_in->lines; line++)
         {
-            // Et pour chaque colonne de la données d'entrée
-            for (int column = 0; column<13; column++)
+            for (int column=0; column<couche_in->columns; column++)
             {
-                Conv2D_1_datas[neuron][line][column] = 0;
-                for (int window_x = 0; window_x<Conv2D_shape->kernel[0]; window_x++)
-                {
-                    for (int window_y = 0; window_y<Conv2D_shape->kernel[1]; window_y++)
-                    {
-                        Conv2D_1_datas[neuron][line][column] += (Max_Pool_datas[neuron][line+window_x][column+window_y])*(couche->weights[neuron+window_x+window_y]);
-                    }
-                }
-                (Conv2D_1_datas[neuron][line][column] += couche->bias[neuron]);
-                // Fonction d'activation RELU
-                if (Conv2D_1_datas[neuron][line][column]< 0)
-                {
-                    Conv2D_1_datas[neuron][line][column] = 0;
-                }
+                couche_out->data[0][0][neuron*couche_in->lines*couche_in->columns+line*couche_in->columns+column] = couche_in->data[neuron][line][column];
             }
         }
     }

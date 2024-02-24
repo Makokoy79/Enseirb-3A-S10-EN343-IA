@@ -152,11 +152,19 @@ printf("couche4 debut\n");
       }
   }
 
-printf("couche4 fin\n");
 // Couche 5 => Flatten
   Neural_net.couches[5].nb_neurons = 1;
-  Neural_net.couches[5].lines = Neural_net.couches[5].nb_neurons;
+  Neural_net.couches[5].lines = 1;
   Neural_net.couches[5].columns = Neural_net.couches[4].nb_neurons*Neural_net.couches[4].lines*Neural_net.couches[4].columns;
+  // Allocation de mémoire pour le résultat du flatten
+  Neural_net.couches[5].data = (double***)malloc(Neural_net.couches[5].nb_neurons * sizeof(double**));
+  for (int i = 0; i < Neural_net.couches[5].nb_neurons; ++i)
+  {
+      Neural_net.couches[5].data[i] = (double**)malloc(Neural_net.couches[5].lines * sizeof(double*));
+      for (int j = 0; j < Neural_net.couches[5].lines; ++j) {
+          Neural_net.couches[5].data[i][j] = (double*)malloc(Neural_net.couches[5].columns * sizeof(double));
+      }
+  }
 
 // Couche 6 => Dense
   Neural_net.couches[6].nb_neurons = Neural_net.couches[5].nb_neurons;
