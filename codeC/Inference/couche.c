@@ -132,7 +132,7 @@ void import_couche(Couche_t* couche, int i) {
 
     if (weights_file == NULL) {
         printf("No weights and bias in couche %d\n", i);
-        couche->nb_neurons = 0;
+        //couche->nb_neurons = 0;
         couche->nb_weights = 0;
         couche->nb_bias = 0;
         return;
@@ -145,7 +145,7 @@ void import_couche(Couche_t* couche, int i) {
 
     if (nb_lines == 0) {
         printf("No neurons in layer %d\n", i);
-        couche->nb_neurons = 0;
+        //couche->nb_neurons = 0;
     }
     else
     {
@@ -212,6 +212,8 @@ void import_model(Model_t* model) {
     
 }
 
+// Conv2D fonctionnelle pour 1 entrée
+/*
 void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
     //Pour chaque neurone à traiter
     for (int neuron = 0; neuron<couche_out->nb_neurons; neuron++)
@@ -240,6 +242,51 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
         }
     }
 }
+*/
+
+// Essai de convolution 2D pour traiter x neurones en entrée
+
+void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
+    int kernel_size = couche_out->kernel[0]*couche_out->kernel[1];
+    //Pour chaque neurone à traiter
+    for (int neuron = 0; neuron<couche_out->nb_neurons; neuron++)
+    {
+        // Pour chaque ligne de la donnée de sortie
+        for (int line = 0; line<(couche_out->lines); line++)
+        {
+            // Et pour chaque colonne de la données de sortie
+            for (int column = 0; column<(couche_out->columns); column++)
+            {
+                // Pour chaque neurone d'entrée
+                double value_out = 0;
+                for (int neuron_in=0; neuron_in<couche_in->nb_neurons; neuron_in++)
+                {
+                    // double value_out = 0;
+                    // Pour chaque élément de la fenêtre de convolution (Kernel)
+                    for (int window_x = 0; window_x<couche_out->kernel[0]; window_x++)
+                    {
+                        for (int window_y = 0; window_y<couche_out->kernel[1]; window_y++)
+                        {
+                            // Cherhce le bon poids à appliquer
+                            double weight = couche_out->weights[neuron*couche_in->nb_neurons*kernel_size + neuron_in*kernel_size + window_x*couche_out->kernel[1]+window_y];
+                            // Appliquer le poids 
+                            value_out += (couche_in->data[neuron_in][line+window_x][column+window_y])*weight;
+                        }
+                    }
+                }
+                // Application du biais
+                value_out += couche_out->bias[neuron];
+                // Fonction d'activation RELU
+                if (value_out< 0)
+                {
+                    value_out = 0;
+                }
+                couche_out->data[neuron][line][column] = value_out;
+            }
+        }
+    }
+}
+
 
 void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas) {
     // FILE *inter_file;
@@ -300,21 +347,24 @@ void MaxPooling2D(Couche_t* couche_in, Couche_t* couche_out)
         {
             for (int column=0; column<couche_out->columns; column++)
             {
-                double max = couche_in->data[neuron][line*couche_out->kernel[0]][column*couche_out->kernel[1]];
+                // voir cette initialisation
+                double max = 0;
                 for (int window_x=0; window_x<couche_out->kernel[0]; window_x++)
                 {
+                    int index_x = line * couche_out->kernel[0] + window_x;
                     for (int window_y=0; window_y<couche_out->kernel[1]; window_y++)
                     {
+                        int index_y = column * couche_out->kernel[1] + window_y;
                         if (window_x==0 && window_y==0)
                         {
-                            max = couche_in->data[neuron][(line*couche_out->kernel[0])][(column*couche_out->kernel[1])];
-                        }else if (couche_in->data[neuron][(line*couche_out->kernel[0])+window_x][(column*couche_out->kernel[1])+window_y] > max)
+                            max = couche_in->data[neuron][index_x][index_y];
+                        }else if (couche_in->data[neuron][index_x][index_y] > max)
                         {
-                            max = couche_in->data[neuron][(line*couche_out->kernel[0])+window_x][(column*couche_out->kernel[1])+window_y];
+                            max = couche_in->data[neuron][index_x][index_y];
                         }
                     }
                 }
-                couche_out->data[neuron][line/couche_out->kernel[0]][column/couche_out->kernel[1]] = max;
+                couche_out->data[neuron][line][column] = max;
             }
         }
     }

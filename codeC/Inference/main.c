@@ -62,7 +62,7 @@ int main(int argc, char* argv[]){
   Neural_net.couches[0].data = (double***)malloc(Neural_net.couches[0].nb_neurons * sizeof(double**));
   for (int i = 0; i < Neural_net.couches[0].lines; ++i) {
       Neural_net.couches[0].data[i] = (double**)malloc(Neural_net.couches[0].lines * sizeof(double*));
-      for (int j = 0; j < Neural_net.couches[0].columns; ++j) {
+      for (int j = 0; j < Neural_net.couches[0].lines; ++j) {
           Neural_net.couches[0].data[i][j] = (double*)malloc(Neural_net.couches[0].columns * sizeof(double));
       }
   }
@@ -92,7 +92,7 @@ int main(int argc, char* argv[]){
   for (int i = 0; i < Neural_net.couches[1].nb_neurons; ++i)
   {
       Neural_net.couches[1].data[i] = (double**)malloc(Neural_net.couches[1].lines * sizeof(double*));
-      for (int j = 0; j < Neural_net.couches[1].columns; ++j) {
+      for (int j = 0; j < Neural_net.couches[1].lines; ++j) {
           Neural_net.couches[1].data[i][j] = (double*)malloc(Neural_net.couches[1].columns * sizeof(double));
       }
   }
@@ -103,9 +103,18 @@ int main(int argc, char* argv[]){
   Neural_net.couches[2].nb_bias = 0;
   Neural_net.couches[2].kernel[0] = 2;
   Neural_net.couches[2].kernel[1] = 2;
-  Neural_net.couches[2].lines = Neural_net.couches[1].lines/Neural_net.couches[2].kernel[0];
-  Neural_net.couches[2].columns = Neural_net.couches[1].columns/Neural_net.couches[2].kernel[1];
-
+  Neural_net.couches[2].lines = ((Neural_net.couches[1].lines-Neural_net.couches[2].kernel[0])/Neural_net.couches[2].kernel[0])+1;
+  Neural_net.couches[2].columns = ((Neural_net.couches[1].columns-Neural_net.couches[2].kernel[1])/Neural_net.couches[2].kernel[1])+1;
+  // Allocation de mémoire pour le résultat du max pooling numéro 1
+  Neural_net.couches[2].data = (double***)malloc(Neural_net.couches[2].nb_neurons * sizeof(double**));
+  for (int i = 0; i < Neural_net.couches[2].nb_neurons; ++i)
+  {
+      Neural_net.couches[2].data[i] = (double**)malloc(Neural_net.couches[2].lines * sizeof(double*));
+      for (int j = 0; j < Neural_net.couches[2].lines; ++j) {
+          Neural_net.couches[2].data[i][j] = (double*)malloc(Neural_net.couches[2].columns * sizeof(double));
+      }
+  }
+  
 // Couche 3 => Convolution 2D
   Neural_net.couches[3].nb_neurons = 64;
   Neural_net.couches[3].nb_weights = 0;
@@ -115,16 +124,35 @@ int main(int argc, char* argv[]){
   Neural_net.couches[3].lines = Neural_net.couches[2].lines-Neural_net.couches[3].kernel[0]+1;
   Neural_net.couches[3].columns = Neural_net.couches[2].columns-Neural_net.couches[3].kernel[1]+1;
   Neural_net.couches[3].activation = 'R';
-  
+  // Allocation de mémoire pour le résultat de la convolution 2D numéro 2
+  Neural_net.couches[3].data = (double***)malloc(Neural_net.couches[3].nb_neurons * sizeof(double**));
+  for (int i = 0; i < Neural_net.couches[3].nb_neurons; ++i)
+  {
+      Neural_net.couches[3].data[i] = (double**)malloc(Neural_net.couches[3].lines * sizeof(double*));
+      for (int j = 0; j < Neural_net.couches[3].lines; ++j) {
+          Neural_net.couches[3].data[i][j] = (double*)malloc(Neural_net.couches[3].columns * sizeof(double));
+      }
+  }
+printf("couche4 debut\n");
 // Couche 4 => Max Pooling
-  Neural_net.couches[4].nb_neurons = Neural_net.couches[2].nb_neurons;
+  Neural_net.couches[4].nb_neurons = Neural_net.couches[3].nb_neurons;
   Neural_net.couches[4].nb_weights = 0;
   Neural_net.couches[4].nb_bias = 0;
   Neural_net.couches[4].kernel[0] = 2;
   Neural_net.couches[4].kernel[1] = 2;
-  Neural_net.couches[4].lines = Neural_net.couches[3].lines/Neural_net.couches[4].kernel[0];
-  Neural_net.couches[4].columns = Neural_net.couches[3].columns/Neural_net.couches[4].kernel[1];
+  Neural_net.couches[4].lines = ((Neural_net.couches[3].lines-Neural_net.couches[4].kernel[0])/Neural_net.couches[4].kernel[0])+1;
+  Neural_net.couches[4].columns = ((Neural_net.couches[3].columns-Neural_net.couches[4].kernel[1])/Neural_net.couches[4].kernel[1])+1;
+  // Allocation de mémoire pour le résultat du max pooling numéro 2
+  Neural_net.couches[4].data = (double***)malloc(Neural_net.couches[4].nb_neurons * sizeof(double**));
+  for (int i = 0; i < Neural_net.couches[4].nb_neurons; ++i)
+  {
+      Neural_net.couches[4].data[i] = (double**)malloc(Neural_net.couches[4].lines * sizeof(double*));
+      for (int j = 0; j < Neural_net.couches[4].lines; ++j) {
+          Neural_net.couches[4].data[i][j] = (double*)malloc(Neural_net.couches[4].columns * sizeof(double));
+      }
+  }
 
+printf("couche4 fin\n");
 // Couche 5 => Flatten
   Neural_net.couches[5].nb_neurons = 1;
   Neural_net.couches[5].lines = Neural_net.couches[5].nb_neurons;
@@ -136,7 +164,6 @@ int main(int argc, char* argv[]){
   Neural_net.couches[6].columns = 10;
 
   import_model(&Neural_net);
-
   printf("Importation du modèle OK\n");
 
   // Vérification que les poids sont bien importés
@@ -159,8 +186,9 @@ int main(int argc, char* argv[]){
   printf("Fin de traitement couche 1 : Convolution 2D\n");
 
   // Vérification de la sortie de la convolution 2D pour le neurone x à saisir manuellement
-/*     int neuron = 0;
-    printf("Neuron n°%d : ", neuron);
+ /*
+  int neuron = 12;
+    printf("Neuron n°%d : \n", neuron);
     for (int line=0; line<Neural_net.couches[1].lines; line++)
     {
       for (int column=0; column<Neural_net.couches[1].columns; column++)
@@ -168,39 +196,70 @@ int main(int argc, char* argv[]){
         printf("%f\t", Neural_net.couches[1].data[neuron][line][column]);
       }
       printf("\n");
-    } */
+    }
+*/
 
   /* Debug couche 1 */
   // printf("Debug couche 1 : Conv2D(32, kernel=(3, 3), activation=relu)\n");
   // debug_couche1(&bitmap, &Conv2D_1, &Neural_net.couches[0], Conv2D_1_datas);
 
-  //Max Pooling
-
   //Max_pooling
+  MaxPooling2D(&Neural_net.couches[1], &Neural_net.couches[2]);
   printf("Fin de traitement couche 2 : Max_pooling\n");
-  // Affichage des résultats de la couche 1 (Convolution 2D)
-/*   int nb_cases = 0;
-  for (int neuron=0; neuron<32; neuron++)
+  // Vérification de la sortie du max pooling pour le neurone x à saisir manuellement
+/*
+  int neuron = 45;
+  printf("Neurone n°%d : \n", neuron);
+  for (int line=0; line<Neural_net.couches[2].lines; line++)
   {
-      for (int ligne=0; ligne<13; ligne++)
-      {
-        for (int colonne=0; colonne<13; colonne++)
-        {
-          printf("Result neuron %d, case %d : %.20f\n", neuron, (ligne*10)+colonne+1, Neural_net.couches[1].data[neuron][ligne][colonne]);
-          nb_cases++;
-        }
-      }
+    for (int column=0; column<Neural_net.couches[2].columns; column++)
+    {
+      printf("%f\t", Neural_net.couches[2].data[neuron][line][column]);
+    }
+    printf("\n");
   }
-  printf("Nombre de valeurs : %d\n", nb_cases);
- */
-  //Convolution 2D
-    //TODO
+*/
 
-  //Max_pooling
-    //TODO
+  //Convolution 2D 2
+  /* Couche 1 */
+  Conv2D(&Neural_net.couches[2], &Neural_net.couches[3]);
+  printf("Fin de traitement couche 3 : Convolution 2D\n");
+  // Vérification de la sortie de la convolution 2D pour le neurone x à saisir manuellement
+/* 
+  int neuron = 51;
+    printf("Neuron n°%d : \n", neuron);
+    for (int line=0; line<Neural_net.couches[3].lines; line++)
+    {
+      for (int column=0; column<Neural_net.couches[3].columns; column++)
+      {
+        printf("%f\t", Neural_net.couches[3].data[neuron][line][column]);
+      }
+      printf("\n");
+    }
+*/
+
+  //Max_pooling 2
+  MaxPooling2D(&Neural_net.couches[3], &Neural_net.couches[4]);
+  printf("Fin de traitement couche 4 : Max_pooling\n");
+  // Vérification de la sortie du max pooling pour le neurone x à saisir manuellement
+
+  int neuron = 45;
+  printf("Neurone n°%d : \n", neuron);
+  for (int line=0; line<Neural_net.couches[4].lines; line++)
+  {
+    for (int column=0; column<Neural_net.couches[4].columns; column++)
+    {
+      printf("%f\t", Neural_net.couches[4].data[neuron][line][column]);
+    }
+    printf("\n");
+  }
+
 
   // Flatten
-    // TODO
+    //TODO
+
+  // Dense
+    //TODO
 
 
   
