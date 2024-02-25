@@ -357,12 +357,15 @@ void MaxPooling2D(Couche_t* couche_in, Couche_t* couche_out)
                     for (int window_y=0; window_y<couche_out->kernel[1]; window_y++)
                     {
                         int index_y = column * couche_out->kernel[1] + window_y;
-                        if (window_x==0 && window_y==0)
+                        if (index_x<=couche_in->lines-1 && index_y<=couche_in->columns-1)
                         {
-                            max = couche_in->data[neuron][index_x][index_y];
-                        }else if (couche_in->data[neuron][index_x][index_y] > max)
-                        {
-                            max = couche_in->data[neuron][index_x][index_y];
+                            if (window_x==0 && window_y==0)
+                            {
+                                max = couche_in->data[neuron][index_x][index_y];
+                            }else if (couche_in->data[neuron][index_x][index_y] > max)
+                            {
+                                max = couche_in->data[neuron][index_x][index_y];
+                            }
                         }
                     }
                 }

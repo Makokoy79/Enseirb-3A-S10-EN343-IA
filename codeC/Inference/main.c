@@ -22,9 +22,9 @@ int main(int argc, char* argv[]){
   BMP bitmap;
   FILE* pFichier=NULL;
 
-  pFichier=fopen("../Lecture/0_20.bmp", "rb");     //Ouverture du fichier contenant l'image
+  pFichier=fopen("../Lecture/9_20.bmp", "rb");     //Ouverture du fichier contenant l'image
   if (pFichier==NULL) {
-      printf("%s\n", "0_20.bmp");
+      printf("%s\n", "9_20.bmp");
       printf("Erreur dans la lecture du fichier\n");
   }
   LireBitmap(pFichier, &bitmap);
@@ -203,8 +203,8 @@ printf("couche4 debut\n");
   printf("Fin de traitement couche 1 : Convolution 2D\n");
 
   // Vérification de la sortie de la convolution 2D pour le neurone x à saisir manuellement
- /*
-  int neuron = 12;
+ 
+  int neuron = 0;
     printf("Neuron n°%d : \n", neuron);
     for (int line=0; line<Neural_net.couches[1].lines; line++)
     {
@@ -214,7 +214,7 @@ printf("couche4 debut\n");
       }
       printf("\n");
     }
-*/
+
 
   /* Debug couche 1 */
   // printf("Debug couche 1 : Conv2D(32, kernel=(3, 3), activation=relu)\n");
