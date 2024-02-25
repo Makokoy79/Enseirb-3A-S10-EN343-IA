@@ -22,9 +22,9 @@ int main(int argc, char* argv[]){
   BMP bitmap;
   FILE* pFichier=NULL;
 
-  pFichier=fopen("../Lecture/9_20.bmp", "rb");     //Ouverture du fichier contenant l'image
+  pFichier=fopen("../Lecture/0_20.bmp", "rb");     //Ouverture du fichier contenant l'image
   if (pFichier==NULL) {
-      printf("%s\n", "9_20.bmp");
+      printf("%s\n", "0_20.bmp");
       printf("Erreur dans la lecture du fichier\n");
   }
   LireBitmap(pFichier, &bitmap);
@@ -34,7 +34,7 @@ int main(int argc, char* argv[]){
   // Permet d'afficher les valeurs de chaque pixel de l'image importée.
   // Pratique pour faire les calculs à la main et vérifier les résultats d'un traitement
   // Pour debug seulement
-  /*
+/*
   for (int line=0; line<bitmap.infoHeader.hauteur; line++)
   {
     for (int column=0; column<bitmap.infoHeader.largeur; column++)
@@ -43,7 +43,7 @@ int main(int argc, char* argv[]){
     }
     printf("\n");
   }
-  */
+*/
 
   /********** Lilian : Import of the model with weights and biais **********/
 
@@ -77,6 +77,18 @@ int main(int argc, char* argv[]){
   // Libérer bitmap
   DesallouerBMP(&bitmap);
 
+  // Je m'assure que l'image a bien été copiée dans la mémoire du réseau de neurone
+  // Vérifié ==> OK
+/*
+  for (int line=0; line<Neural_net.couches[0].lines; line++)
+  {
+    for (int column=0; column<Neural_net.couches[0].columns; column++)
+    {
+      printf("%f\t", Neural_net.couches[0].data[0][line][column]);
+    }
+    printf("\n");
+  }
+*/
 
 // Couche 1 => Convolution 2D
   Neural_net.couches[1].nb_neurons = 32;
@@ -133,7 +145,7 @@ int main(int argc, char* argv[]){
           Neural_net.couches[3].data[i][j] = (double*)malloc(Neural_net.couches[3].columns * sizeof(double));
       }
   }
-printf("couche4 debut\n");
+
 // Couche 4 => Max Pooling
   Neural_net.couches[4].nb_neurons = Neural_net.couches[3].nb_neurons;
   Neural_net.couches[4].nb_weights = 0;
@@ -198,7 +210,7 @@ printf("couche4 debut\n");
   }
  */
   // Vérification que les poids sont bien importés dans la 1ère couche de convolution 2D
-  // A vérifier
+  // Vérifié ==> OK
 /*   
   printf("nombre de neurones : %d\n",Neural_net.couches[3].nb_neurons );
   for (int neuron=0; neuron<Neural_net.couches[3].nb_neurons; neuron++)
@@ -212,19 +224,21 @@ printf("couche4 debut\n");
     printf("\n");
   }
  */
-  //double weight = couche_out->weights[neuron*couche_in->nb_neurons*kernel_size + neuron_in*kernel_size + window_x*couche_out->kernel[1] + window_y];
-
 
   /********** Rémy : Calcul  **********/
 
   /* Couche 1 */
   Conv2D(&Neural_net.couches[0], &Neural_net.couches[1]);
   printf("Fin de traitement couche 1 : Convolution 2D\n");
+
+  // Vérification de la sortie de la convolution 2D pour chaque neurone
 /*
-  // Vérification de la sortie de la convolution 2D pour le neurone x à saisir manuellement
- 
-  int neuron = 0;
+  for (int neuron = 0;neuron<Neural_net.couches[1].nb_neurons; neuron++)
+  {
     printf("Neuron n°%d : \n", neuron);
+    char chaine[2];
+    printf("PAUSE");
+    fgets(chaine, 2, stdin);
     for (int line=0; line<Neural_net.couches[1].lines; line++)
     {
       for (int column=0; column<Neural_net.couches[1].columns; column++)
@@ -232,7 +246,9 @@ printf("couche4 debut\n");
         printf("%f\t", Neural_net.couches[1].data[neuron][line][column]);
       }
       printf("\n");
+
     }
+  }
 */
 
   /* Debug couche 1 */
@@ -242,6 +258,7 @@ printf("couche4 debut\n");
   //Max_pooling
   MaxPooling2D(&Neural_net.couches[1], &Neural_net.couches[2]);
   printf("Fin de traitement couche 2 : Max_pooling\n");
+
   // Vérification de la sortie du max pooling pour le neurone x à saisir manuellement
 /*  
   for (int neuron = 0; neuron<Neural_net.couches[2].nb_neurons; neuron++)
@@ -299,16 +316,17 @@ printf("couche4 debut\n");
   // Flatten
   flatten(&Neural_net.couches[4], &Neural_net.couches[5]);
   printf("Fin de traitement couche 5 : Flatten\n");
-/*
+
   for (int donnee=0; donnee<Neural_net.couches[5].columns; donnee++)
   {
     printf("donnée : %f\t", Neural_net.couches[5].data[0][0][donnee]);
-    if (donnee%10 == 0)
+    if (donnee != 0 && donnee%10 == 0)
     {
       printf("\n");
     }
   }
-*/
+  printf("\n");
+
 
   // Dense
   dense(&Neural_net.couches[5], &Neural_net.couches[6]);

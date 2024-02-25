@@ -214,64 +214,31 @@ void import_model(Model_t* model) {
     
 }
 
-// Conv2D fonctionnelle pour 1 entrée
-/*
-void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
-    //Pour chaque neurone à traiter
-    for (int neuron = 0; neuron<couche_out->nb_neurons; neuron++)
-    {
-        // Pour chaque ligne de la donnée d'entrée
-        for (int line = 0; line<(couche_out->lines); line++)
-        {
-            // Et pour chaque colonne de la données d'entrée
-            for (int column = 0; column<(couche_out->columns); column++)
-            {
-                for (int window_x = 0; window_x<couche_out->kernel[0]; window_x++)
-                {
-                    for (int window_y = 0; window_y<couche_out->kernel[1]; window_y++)
-                    {
-                        double weight = couche_out->weights[neuron*couche_out->nb_weights + window_x*couche_out->kernel[0]+window_y];
-                        couche_out->data[neuron][line][column] += (couche_in->data[0][line+window_x][column+window_y])*weight;
-                    }
-                }
-                (couche_out->data[neuron][line][column] += couche_out->bias[neuron]);
-                // Fonction d'activation RELU
-                if (couche_out->data[neuron][line][column]< 0)
-                {
-                    couche_out->data[neuron][line][column] = 0;
-                }
-            }
-        }
-    }
-}
-*/
-
-// Essai de convolution 2D pour traiter x neurones en entrée
-
 void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
     int kernel_size = couche_out->kernel[0]*couche_out->kernel[1];
     //Pour chaque neurone à traiter
     for (int neuron = 0; neuron<couche_out->nb_neurons; neuron++)
     {
         // 3 lignes pour faire un pause en débug. A commenter en opérationnel
-/* 
+/*
         char chaine[2];
         printf("PAUSE");
         fgets(chaine, 2, stdin);
- */
+*/
         // Pour chaque ligne de la donnée de sortie
         for (int line = 0; line<(couche_out->lines); line++)
         {
             // Et pour chaque colonne de la données de sortie
             for (int column = 0; column<(couche_out->columns); column++)
             {
+                //printf("ligne %d Colonne %d\n", line, column);
                 // Pour chaque neurone d'entrée
                 double value_out = 0;
                 for (int neuron_in=0; neuron_in<couche_in->nb_neurons; neuron_in++)
                 {
                     // double value_out = 0;
                     // Pour chaque élément de la fenêtre de convolution (Kernel)
-                    //printf("Neurone out %d neurone in %d\t", neuron, neuron_in);
+                    // printf("Neurone out %d neurone in %d\t", neuron, neuron_in);
                     for (int window_x = 0; window_x<couche_out->kernel[0]; window_x++)
                     {
                         for (int window_y = 0; window_y<couche_out->kernel[1]; window_y++)
@@ -280,15 +247,18 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
                             double weight = couche_out->weights[neuron*couche_in->nb_neurons*kernel_size + neuron_in*kernel_size + window_x*couche_out->kernel[1]+window_y];
                             // Appliquer le poids 
                             value_out += (couche_in->data[neuron_in][line+window_x][column+window_y])*weight;
-                            //printf("poids : %f\t", weight);
+                            // printf("poids : %f\t", weight);
+                            // Affiche les valeurs de la donnée d'entrée
+                            //printf("%f\t", couche_in->data[neuron_in][line+window_x][column+window_y]);
                         }
+                        //printf("\n");
                     }
                     //printf("\n");
                 }
                 // Application du biais
-                value_out += couche_out->bias[neuron];
                 // vérification du bon biais appliqué (à commenter en opérationnel)
                 //printf("Biais appliqué neurone %d : %f\n", neuron, couche_out->bias[neuron]);
+                value_out += couche_out->bias[neuron];
                 // Fonction d'activation RELU
                 if (value_out< 0)
                 {
@@ -299,7 +269,6 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
         }
     }
 }
-
 
 void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas) {
     // FILE *inter_file;
@@ -368,15 +337,12 @@ void MaxPooling2D(Couche_t* couche_in, Couche_t* couche_out)
                     for (int window_y=0; window_y<couche_out->kernel[1]; window_y++)
                     {
                         int index_y = column * couche_out->kernel[1] + window_y;
-                        if (index_x<=couche_in->lines-1 && index_y<=couche_in->columns-1)
+                        if (window_x==0 && window_y==0)
                         {
-                            if (window_x==0 && window_y==0)
-                            {
-                                max = couche_in->data[neuron][index_x][index_y];
-                            }else if (couche_in->data[neuron][index_x][index_y] > max)
-                            {
-                                max = couche_in->data[neuron][index_x][index_y];
-                            }
+                            max = couche_in->data[neuron][index_x][index_y];
+                        }else if (couche_in->data[neuron][index_x][index_y] > max)
+                        {
+                            max = couche_in->data[neuron][index_x][index_y];
                         }
                     }
                 }
