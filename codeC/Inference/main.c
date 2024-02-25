@@ -183,9 +183,10 @@ printf("couche4 debut\n");
   import_model(&Neural_net);
   printf("Importation du modèle OK\n");
 
-  // Vérification que les poids sont bien importés
+  // Vérification que les poids sont bien importés dans la 1ère couche de convolution 2D
   // Vérifié. Les poids sont importés correctement
-/*   printf("nombre de neurones : %d\n",Neural_net.couches[1].nb_neurons );
+/*   
+  printf("nombre de neurones : %d\n",Neural_net.couches[1].nb_neurons );
   for (int neuron=0; neuron<Neural_net.couches[1].nb_neurons; neuron++)
   {
     printf("Neurone %d\t", neuron);
@@ -194,14 +195,32 @@ printf("couche4 debut\n");
       printf("%f\t", Neural_net.couches[1].weights[neuron*Neural_net.couches[1].nb_weights+weight]);
     }
     printf("\n");
-  } */
+  }
+ */
+  // Vérification que les poids sont bien importés dans la 1ère couche de convolution 2D
+  // A vérifier
+/*   
+  printf("nombre de neurones : %d\n",Neural_net.couches[3].nb_neurons );
+  for (int neuron=0; neuron<Neural_net.couches[3].nb_neurons; neuron++)
+  {
+    printf("Neurone %d\t", neuron);
+    for (int weight=0; weight<Neural_net.couches[3].nb_weights; weight++)
+    {
+
+      printf("%f\t", Neural_net.couches[1].weights[neuron*Neural_net.couches[1].nb_weights+weight]);
+    }
+    printf("\n");
+  }
+ */
+  //double weight = couche_out->weights[neuron*couche_in->nb_neurons*kernel_size + neuron_in*kernel_size + window_x*couche_out->kernel[1] + window_y];
+
 
   /********** Rémy : Calcul  **********/
 
   /* Couche 1 */
   Conv2D(&Neural_net.couches[0], &Neural_net.couches[1]);
   printf("Fin de traitement couche 1 : Convolution 2D\n");
-
+/*
   // Vérification de la sortie de la convolution 2D pour le neurone x à saisir manuellement
  
   int neuron = 0;
@@ -214,7 +233,7 @@ printf("couche4 debut\n");
       }
       printf("\n");
     }
-
+*/
 
   /* Debug couche 1 */
   // printf("Debug couche 1 : Conv2D(32, kernel=(3, 3), activation=relu)\n");
@@ -224,26 +243,28 @@ printf("couche4 debut\n");
   MaxPooling2D(&Neural_net.couches[1], &Neural_net.couches[2]);
   printf("Fin de traitement couche 2 : Max_pooling\n");
   // Vérification de la sortie du max pooling pour le neurone x à saisir manuellement
-/*
-  int neuron = 45;
-  printf("Neurone n°%d : \n", neuron);
-  for (int line=0; line<Neural_net.couches[2].lines; line++)
+/*  
+  for (int neuron = 0; neuron<Neural_net.couches[2].nb_neurons; neuron++)
   {
-    for (int column=0; column<Neural_net.couches[2].columns; column++)
+    printf("Neuron n°%d : \n", neuron);
+    for (int line=0; line<Neural_net.couches[2].lines; line++)
     {
-      printf("%f\t", Neural_net.couches[2].data[neuron][line][column]);
+      for (int column=0; column<Neural_net.couches[2].columns; column++)
+      {
+        printf("%f\t", Neural_net.couches[2].data[neuron][line][column]);
+      }
+      printf("\n");
     }
-    printf("\n");
   }
 */
-
   //Convolution 2D 2
   /* Couche 1 */
   Conv2D(&Neural_net.couches[2], &Neural_net.couches[3]);
   printf("Fin de traitement couche 3 : Convolution 2D\n");
   // Vérification de la sortie de la convolution 2D pour le neurone x à saisir manuellement
-/* 
-  int neuron = 51;
+/*
+  for (int neuron = 0; neuron<Neural_net.couches[3].nb_neurons; neuron++)
+  {
     printf("Neuron n°%d : \n", neuron);
     for (int line=0; line<Neural_net.couches[3].lines; line++)
     {
@@ -253,6 +274,7 @@ printf("couche4 debut\n");
       }
       printf("\n");
     }
+  }
 */
 
   //Max_pooling 2
@@ -260,21 +282,33 @@ printf("couche4 debut\n");
   printf("Fin de traitement couche 4 : Max_pooling\n");
   // Vérification de la sortie du max pooling pour le neurone x à saisir manuellement
 /*
-  int neuron = 45;
-  printf("Neurone n°%d : \n", neuron);
-  for (int line=0; line<Neural_net.couches[4].lines; line++)
+  for (int neuron=0; neuron<Neural_net.couches[4].nb_neurons; neuron++)
   {
-    for (int column=0; column<Neural_net.couches[4].columns; column++)
+    printf("Neurone n°%d : \n", neuron);
+    for (int line=0; line<Neural_net.couches[4].lines; line++)
     {
-      printf("%f\t", Neural_net.couches[4].data[neuron][line][column]);
+      for (int column=0; column<Neural_net.couches[4].columns; column++)
+      {
+        printf("%f\t", Neural_net.couches[4].data[neuron][line][column]);
+      }
+      printf("\n");
     }
-    printf("\n");
   }
 */
 
   // Flatten
   flatten(&Neural_net.couches[4], &Neural_net.couches[5]);
   printf("Fin de traitement couche 5 : Flatten\n");
+/*
+  for (int donnee=0; donnee<Neural_net.couches[5].columns; donnee++)
+  {
+    printf("donnée : %f\t", Neural_net.couches[5].data[0][0][donnee]);
+    if (donnee%10 == 0)
+    {
+      printf("\n");
+    }
+  }
+*/
 
   // Dense
   dense(&Neural_net.couches[5], &Neural_net.couches[6]);

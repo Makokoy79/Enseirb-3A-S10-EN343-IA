@@ -70,7 +70,7 @@ void read_file(FILE *file, int nb_lines, int nb_values_per_line, double* texte) 
         return;
     }
 
-    char buffer[1000];
+    char buffer[1000000];
 
     for (int i = 0; i < nb_lines; i++) {
         if (fgets(buffer, sizeof(buffer), file) != NULL) {
@@ -253,6 +253,12 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
     //Pour chaque neurone à traiter
     for (int neuron = 0; neuron<couche_out->nb_neurons; neuron++)
     {
+        // 3 lignes pour faire un pause en débug. A commenter en opérationnel
+/* 
+        char chaine[2];
+        printf("PAUSE");
+        fgets(chaine, 2, stdin);
+ */
         // Pour chaque ligne de la donnée de sortie
         for (int line = 0; line<(couche_out->lines); line++)
         {
@@ -265,19 +271,24 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
                 {
                     // double value_out = 0;
                     // Pour chaque élément de la fenêtre de convolution (Kernel)
+                    //printf("Neurone out %d neurone in %d\t", neuron, neuron_in);
                     for (int window_x = 0; window_x<couche_out->kernel[0]; window_x++)
                     {
                         for (int window_y = 0; window_y<couche_out->kernel[1]; window_y++)
                         {
-                            // Cherhce le bon poids à appliquer
+                            // Cherche le bon poids à appliquer
                             double weight = couche_out->weights[neuron*couche_in->nb_neurons*kernel_size + neuron_in*kernel_size + window_x*couche_out->kernel[1]+window_y];
                             // Appliquer le poids 
                             value_out += (couche_in->data[neuron_in][line+window_x][column+window_y])*weight;
+                            //printf("poids : %f\t", weight);
                         }
                     }
+                    //printf("\n");
                 }
                 // Application du biais
                 value_out += couche_out->bias[neuron];
+                // vérification du bon biais appliqué (à commenter en opérationnel)
+                //printf("Biais appliqué neurone %d : %f\n", neuron, couche_out->bias[neuron]);
                 // Fonction d'activation RELU
                 if (value_out< 0)
                 {
@@ -400,10 +411,13 @@ void dense(Couche_t* couche_in, Couche_t* couche_out)
             couche_out->data[0][0][classe] += couche_in->data[0][0][entree] * couche_out->weights[classe*couche_out->columns+entree];
         }
         couche_out->data[0][0][classe] += couche_out->bias[classe];
+        couche_out->data[0][0][classe] = exp(couche_out->data[0][0][classe]);
         somme += couche_out->data[0][0][classe];        
     }
-    for (int sortie=0; sortie<couche_out->columns; sortie++)
+    // Application de la fonction softmax
+    for (int sortie = 0; sortie < couche_out->columns; sortie++)
     {
+        // Application de softmax à chaque score
         couche_out->data[0][0][sortie] /= somme;
     }
 }
