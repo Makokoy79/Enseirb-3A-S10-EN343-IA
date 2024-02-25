@@ -22,9 +22,9 @@ int main(int argc, char* argv[]){
   BMP bitmap;
   FILE* pFichier=NULL;
 
-  pFichier=fopen("../Lecture/0_20.bmp", "rb");     //Ouverture du fichier contenant l'image
+  pFichier=fopen("../Lecture/4_20.bmp", "rb");     //Ouverture du fichier contenant l'image
   if (pFichier==NULL) {
-      printf("%s\n", "0_20.bmp");
+      printf("%s\n", "4_20.bmp");
       printf("Erreur dans la lecture du fichier\n");
   }
   LireBitmap(pFichier, &bitmap);
@@ -260,7 +260,7 @@ int main(int argc, char* argv[]){
   printf("Fin de traitement couche 2 : Max_pooling\n");
 
   // Vérification de la sortie du max pooling pour le neurone x à saisir manuellement
-/*  
+/*
   for (int neuron = 0; neuron<Neural_net.couches[2].nb_neurons; neuron++)
   {
     printf("Neuron n°%d : \n", neuron);
@@ -274,6 +274,7 @@ int main(int argc, char* argv[]){
     }
   }
 */
+
   //Convolution 2D 2
   /* Couche 1 */
   Conv2D(&Neural_net.couches[2], &Neural_net.couches[3]);
@@ -316,7 +317,7 @@ int main(int argc, char* argv[]){
   // Flatten
   flatten(&Neural_net.couches[4], &Neural_net.couches[5]);
   printf("Fin de traitement couche 5 : Flatten\n");
-
+/*
   for (int donnee=0; donnee<Neural_net.couches[5].columns; donnee++)
   {
     printf("donnée : %f\t", Neural_net.couches[5].data[0][0][donnee]);
@@ -326,7 +327,7 @@ int main(int argc, char* argv[]){
     }
   }
   printf("\n");
-
+*/
 
   // Dense
   dense(&Neural_net.couches[5], &Neural_net.couches[6]);

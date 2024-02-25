@@ -374,7 +374,8 @@ void dense(Couche_t* couche_in, Couche_t* couche_out)
         couche_out->data[0][0][classe] = 0;
         for (int entree=0; entree<couche_in->columns; entree++)
         {
-            couche_out->data[0][0][classe] += couche_in->data[0][0][entree] * couche_out->weights[classe*couche_out->columns+entree];
+            couche_out->data[0][0][classe] += couche_in->data[0][0][entree] * couche_out->weights[classe*couche_in->columns+entree];
+            //printf("Poids classe %d neurone_in %d : %f\n", classe, entree, couche_out->weights[classe*couche_in->columns+entree]);
         }
         couche_out->data[0][0][classe] += couche_out->bias[classe];
         couche_out->data[0][0][classe] = exp(couche_out->data[0][0][classe]);
