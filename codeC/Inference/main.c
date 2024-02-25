@@ -22,9 +22,9 @@ int main(int argc, char* argv[]){
   BMP bitmap;
   FILE* pFichier=NULL;
 
-  pFichier=fopen("../Lecture/4_20.bmp", "rb");     //Ouverture du fichier contenant l'image
+  pFichier=fopen("../Lecture/0_20.bmp", "rb");     //Ouverture du fichier contenant l'image
   if (pFichier==NULL) {
-      printf("%s\n", "4_20.bmp");
+      printf("%s\n", "0_20.bmp");
       printf("Erreur dans la lecture du fichier\n");
   }
   LireBitmap(pFichier, &bitmap);
@@ -71,7 +71,7 @@ int main(int argc, char* argv[]){
   {
     for (int column=0; column<Neural_net.couches[0].columns; column++)
     {
-      Neural_net.couches[0].data[0][line][column] = (double)bitmap.mPixelsGray[line][column]/255;
+      Neural_net.couches[0].data[0][line][column] = (double)bitmap.mPixelsGray[column][line]/255;
     }
   }
   // Libérer bitmap
@@ -320,11 +320,11 @@ int main(int argc, char* argv[]){
 /*
   for (int donnee=0; donnee<Neural_net.couches[5].columns; donnee++)
   {
-    printf("donnée : %f\t", Neural_net.couches[5].data[0][0][donnee]);
-    if (donnee != 0 && donnee%10 == 0)
+    if (donnee > 0 && donnee%10 == 0)
     {
       printf("\n");
     }
+    printf("%f\t", Neural_net.couches[5].data[0][0][donnee]);
   }
   printf("\n");
 */

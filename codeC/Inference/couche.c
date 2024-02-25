@@ -220,11 +220,11 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
     for (int neuron = 0; neuron<couche_out->nb_neurons; neuron++)
     {
         // 3 lignes pour faire un pause en débug. A commenter en opérationnel
-/*
+/* 
         char chaine[2];
         printf("PAUSE");
         fgets(chaine, 2, stdin);
-*/
+ */
         // Pour chaque ligne de la donnée de sortie
         for (int line = 0; line<(couche_out->lines); line++)
         {
@@ -238,7 +238,8 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
                 {
                     // double value_out = 0;
                     // Pour chaque élément de la fenêtre de convolution (Kernel)
-                    // printf("Neurone out %d neurone in %d\t", neuron, neuron_in);
+                    // printf("Neurone out %d neurone in %d\n", neuron, neuron_in);
+                    
                     for (int window_x = 0; window_x<couche_out->kernel[0]; window_x++)
                     {
                         for (int window_y = 0; window_y<couche_out->kernel[1]; window_y++)
@@ -247,13 +248,16 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
                             double weight = couche_out->weights[neuron*couche_in->nb_neurons*kernel_size + neuron_in*kernel_size + window_x*couche_out->kernel[1]+window_y];
                             // Appliquer le poids 
                             value_out += (couche_in->data[neuron_in][line+window_x][column+window_y])*weight;
-                            // printf("poids : %f\t", weight);
+/*                             printf("poids : %.20f\t", weight);
                             // Affiche les valeurs de la donnée d'entrée
-                            //printf("%f\t", couche_in->data[neuron_in][line+window_x][column+window_y]);
+                            printf("%f\t", couche_in->data[neuron_in][line+window_x][column+window_y]);
+                            char chaine[2];
+                            printf("PAUSE");
+                            fgets(chaine, 2, stdin); */
                         }
-                        //printf("\n");
+                        // printf("\n");
                     }
-                    //printf("\n");
+                    // printf("\n");
                 }
                 // Application du biais
                 // vérification du bon biais appliqué (à commenter en opérationnel)
@@ -354,13 +358,17 @@ void MaxPooling2D(Couche_t* couche_in, Couche_t* couche_out)
 
 void flatten(Couche_t* couche_in, Couche_t* couche_out)
 {
-    for (int neuron=0; neuron<couche_in->nb_neurons; neuron++)
+    int pixel=0;
+    for (int column=0; column<couche_in->columns; column++)
     {
         for (int line=0; line<couche_in->lines; line++)
         {
-            for (int column=0; column<couche_in->columns; column++)
+            for (int neuron=0; neuron<couche_in->nb_neurons; neuron++)
+            
             {
-                couche_out->data[0][0][neuron*couche_in->lines*couche_in->columns+line*couche_in->columns+column] = couche_in->data[neuron][line][column];
+                //couche_out->data[0][0][neuron*couche_in->lines*couche_in->columns+line*couche_in->columns+column] = couche_in->data[neuron][line][column];
+                couche_out->data[0][0][pixel] = couche_in->data[neuron][line][column];
+                pixel++;
             }
         }
     }
@@ -369,22 +377,30 @@ void flatten(Couche_t* couche_in, Couche_t* couche_out)
 void dense(Couche_t* couche_in, Couche_t* couche_out)
 {
     double somme = 0.0;
+    // printf("Nombre de classes : %d\n", couche_out->columns);
     for (int classe=0; classe<couche_out->columns; classe++)
     {
         couche_out->data[0][0][classe] = 0;
         for (int entree=0; entree<couche_in->columns; entree++)
         {
             couche_out->data[0][0][classe] += couche_in->data[0][0][entree] * couche_out->weights[classe*couche_in->columns+entree];
+/* 
             //printf("Poids classe %d neurone_in %d : %f\n", classe, entree, couche_out->weights[classe*couche_in->columns+entree]);
+            if (classe==0)
+            {
+                printf("%f\t", couche_in->data[0][0][entree]);
+            }
+ */
         }
         couche_out->data[0][0][classe] += couche_out->bias[classe];
         couche_out->data[0][0][classe] = exp(couche_out->data[0][0][classe]);
         somme += couche_out->data[0][0][classe];        
     }
     // Application de la fonction softmax
-    for (int sortie = 0; sortie < couche_out->columns; sortie++)
+    for (int classe = 0; classe < couche_out->columns; classe++)
     {
         // Application de softmax à chaque score
-        couche_out->data[0][0][sortie] /= somme;
+        couche_out->data[0][0][classe] /= somme;
+        //printf("Résultat classe %d : %f\n", classe, couche_out->data[0][0][classe]);
     }
 }
