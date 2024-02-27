@@ -333,7 +333,6 @@ void MaxPooling2D(Couche_t* couche_in, Couche_t* couche_out)
         {
             for (int column=0; column<couche_out->columns; column++)
             {
-                // voir cette initialisation
                 double max = 0;
                 for (int window_x=0; window_x<couche_out->kernel[0]; window_x++)
                 {
@@ -364,9 +363,7 @@ void flatten(Couche_t* couche_in, Couche_t* couche_out)
         for (int line=0; line<couche_in->lines; line++)
         {
             for (int neuron=0; neuron<couche_in->nb_neurons; neuron++)
-            
             {
-                //couche_out->data[0][0][neuron*couche_in->lines*couche_in->columns+line*couche_in->columns+column] = couche_in->data[neuron][line][column];
                 couche_out->data[0][0][pixel] = couche_in->data[neuron][line][column];
                 pixel++;
             }
@@ -390,7 +387,7 @@ void dense(Couche_t* couche_in, Couche_t* couche_out)
             {
                 printf("%f\t", couche_in->data[0][0][entree]);
             }
- */
+*/
         }
         couche_out->data[0][0][classe] += couche_out->bias[classe];
         couche_out->data[0][0][classe] = exp(couche_out->data[0][0][classe]);
