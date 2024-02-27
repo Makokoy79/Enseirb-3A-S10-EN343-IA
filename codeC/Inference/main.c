@@ -142,8 +142,8 @@ int main(int argc, char* argv[]){
   Neural_net.couches[6].lines = Neural_net.couches[5].lines;
   Neural_net.couches[6].columns = 10;
 
-  // Allocation mémoire pour toutes les couches
-  Alloc_memory_datas(&Neural_net);
+  
+  Alloc_memory_datas(&Neural_net.couches[0]); // Allocation mémoire pour la couche 0
 
   // Trasnfert des données de l'image dans la couche 0 (valeurs divisées par 255)
   for (int line=0; line<Neural_net.couches[0].lines; line++)
@@ -206,11 +206,13 @@ int main(int argc, char* argv[]){
 
   /********** Rémy : Calcul  **********/
 
-  /* Couche 1 */
+  /* Couche 1 : CONV2D*/
+  Alloc_memory_datas(&Neural_net.couches[1]); // Allocation mémoire pour la couche 1
   Conv2D(&Neural_net.couches[0], &Neural_net.couches[1]);
   printf("Fin de traitement couche 1 : Convolution 2D\n");
+  Free_memory_datas(&Neural_net.couches[0]); // Libère mémoire pour la couche 0
 
-  // Vérification de la sortie de la convolution 2D pour chaque neurone
+  // Vérification de la sortie de la convolution 2D 1
   if(argc > 2 && !strcmp(argv[2], "couche1"))
   {
     for (int neuron = 0;neuron<Neural_net.couches[1].nb_neurons; neuron++)
@@ -228,11 +230,13 @@ int main(int argc, char* argv[]){
     }
   }
 
-  //Max_pooling
+  /* Couche 2 : Max_pooling*/
+  Alloc_memory_datas(&Neural_net.couches[2]); // Allocation mémoire pour la couche 2
   MaxPooling2D(&Neural_net.couches[1], &Neural_net.couches[2]);
   printf("Fin de traitement couche 2 : Max_pooling\n");
+  Free_memory_datas(&Neural_net.couches[1]); // Libère mémoire pour la couche 1
 
-  // Vérification de la sortie du max pooling pour le neurone x à saisir manuellement
+  // Vérification de la sortie du max pooling 1
   if(argc > 2 && !strcmp(argv[2], "couche2"))
   {
     for (int neuron = 0; neuron<Neural_net.couches[2].nb_neurons; neuron++)
@@ -249,11 +253,13 @@ int main(int argc, char* argv[]){
     }
   }
 
-  //Convolution 2D 2
-  /* Couche 1 */
+  /* Couche 3 : CONV2D*/
+  Alloc_memory_datas(&Neural_net.couches[3]); // Allocation mémoire pour la couche 3
   Conv2D(&Neural_net.couches[2], &Neural_net.couches[3]);
   printf("Fin de traitement couche 3 : Convolution 2D\n");
-  // Vérification de la sortie de la convolution 2D pour le neurone x à saisir manuellement
+  Free_memory_datas(&Neural_net.couches[2]); // Libère mémoire pour la couche 2
+
+  // Vérification de la sortie de la convolution 2D 2
   if(argc > 2 && !strcmp(argv[2], "couche3"))
   {
     for (int neuron = 0; neuron<Neural_net.couches[3].nb_neurons; neuron++)
@@ -270,10 +276,13 @@ int main(int argc, char* argv[]){
     }
   }
 
-  //Max_pooling 2
+  /* Couche 4 : Max_pooling*/
+  Alloc_memory_datas(&Neural_net.couches[4]); // Allocation mémoire pour la couche 4
   MaxPooling2D(&Neural_net.couches[3], &Neural_net.couches[4]);
   printf("Fin de traitement couche 4 : Max_pooling\n");
-  // Vérification de la sortie du max pooling pour le neurone x à saisir manuellement
+  Free_memory_datas(&Neural_net.couches[3]); // Libère mémoire pour la couche 3
+
+  // Vérification de la sortie du max pooling 2
   if(argc > 2 && !strcmp(argv[2], "couche4"))
   {
     for (int neuron=0; neuron<Neural_net.couches[4].nb_neurons; neuron++)
@@ -290,9 +299,13 @@ int main(int argc, char* argv[]){
     }
   }
 
-  // Flatten
+  /* Couche 5 : Flatten*/
+  Alloc_memory_datas(&Neural_net.couches[5]); // Allocation mémoire pour la couche 5
   flatten(&Neural_net.couches[4], &Neural_net.couches[5]);
   printf("Fin de traitement couche 5 : Flatten\n");
+  Free_memory_datas(&Neural_net.couches[4]); // Libère mémoire pour la couche 4
+
+  // Vérification de la sortie du Flatten
   if(argc > 2 && !strcmp(argv[2], "couche5"))
   {
     for (int donnee=0; donnee<Neural_net.couches[5].columns; donnee++)
@@ -301,9 +314,13 @@ int main(int argc, char* argv[]){
     }
   }
 
-  // Dense
+  /* Couche 6 : Dense*/
+  Alloc_memory_datas(&Neural_net.couches[6]); // Allocation mémoire pour la couche 6
   dense(&Neural_net.couches[5], &Neural_net.couches[6]);
   printf("Fin de traitement couche 6 : dense\n\n");
+  Free_memory_datas(&Neural_net.couches[5]); // Libère mémoire pour la couche 5
+
+  // Vérification de la sortie de la couche Dense
   if(argc > 2 && !strcmp(argv[2], "couche5"))
   {
     printf("Couche 6 : résultats\n");
@@ -312,6 +329,10 @@ int main(int argc, char* argv[]){
       printf("%f\n", Neural_net.couches[6].data[0][0][donnee]);
     }
   }
+
+///////////////////////////
+/******** VERDICT ********/
+///////////////////////////
 
   // Calcul du résultat
   double max = 0;
@@ -340,11 +361,8 @@ int main(int argc, char* argv[]){
   printf("avec une probabilité de %.2f%% ***\n", max);
   printf("*************************************************************************\n");
 
-
-  /********** All free **********/
-  Free_memory_datas(&Neural_net);
+  Free_memory_datas(&Neural_net.couches[6]); // Libère mémoire pour la couche 6
 
   return 0;
-
 }
 

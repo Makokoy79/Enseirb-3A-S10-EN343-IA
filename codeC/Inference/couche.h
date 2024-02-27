@@ -40,21 +40,6 @@ typedef struct
     Couche_t *couches;  // Un tableau de couches
 } Model_t;
 
-typedef struct
-{
-    int nb;
-    int kernel[2];
-    char activation;
-} Conv2D_t;
-
-typedef struct
-{
-    int lines;
-    int columns;    
-    int nb;
-    int kernel[2];
-} Maxpool_t;
-
 void pause();
 int is_file_auth(char *argv1);
 void print_double_matrix(double* matrix, int taille);
@@ -63,18 +48,15 @@ int calcul_nb_values_per_line(FILE *file);
 void read_file(FILE *file, int nb_lines, int nb_values_per_line, double* texte);
 void import_couche(Couche_t* couche, int i);
 void import_model(Model_t* model);
-void Alloc_memory_datas(Model_t *Neural_net);
-void Free_memory_datas(Model_t *Neural_net);
+void Alloc_memory_datas(Couche_t* couche_in);
+void Free_memory_datas(Couche_t *couche_in);
 
-// void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas);
 void Conv2D(Couche_t* couche_in, Couche_t* couche_out);
-//void MaxPooling2D(double*** Conv2D_datas, Maxpool_t max_pool_shape, double*** Max_Pool_datas);
+
 void MaxPooling2D(Couche_t* couche_in, Couche_t* couche_out);
 
 void flatten(Couche_t* couche_in, Couche_t* couche_out);
 
 void dense(Couche_t* couche_in, Couche_t* couche_out);
-
-void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas);
 
 #endif

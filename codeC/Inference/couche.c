@@ -52,19 +52,14 @@ void print_double_matrix(double* matrix, int taille) {
 
 int calcul_nb_line(FILE *file) {
     int nb_lines = 0;
-    char ch;
+    char buffer[50000];
 
-    // Compter le nombre de lignes
-    while ((ch = fgetc(file)) != EOF) {
-        if (ch == '\n') {
-            nb_lines++;
-        }
+    while (fgets(buffer, sizeof(buffer), file) != NULL) {
+        nb_lines++;
     }
 
-    // Rembobiner le fichier
     rewind(file);
 
-    //printf("Number of lines: %d\n", nb_lines);
     return nb_lines;
 }
 
@@ -85,33 +80,6 @@ int calcul_nb_values_per_line(FILE *file) {
     // Increment by 1 to account for the last value in the line
     return values_per_line + 1;
 }
-
-/* 
-void read_file(FILE *file, int nb_lines, int nb_values_per_line, double* texte) {
-    if (file == NULL) {
-        perror("Erreur d'ouverture du fichier");
-        return;
-    }
-
-    char buffer[1000000];
-
-    for (int i = 0; i < nb_lines; i++) {
-        if (fgets(buffer, sizeof(buffer), file) != NULL) {
-            // Read the values into the allocated memory
-            char *token = strtok(buffer, " ");
-            int j = 0;
-            while (token != NULL && j < nb_values_per_line) {
-                texte[i * nb_values_per_line + j] = atof(token);
-                token = strtok(NULL, " ");
-                j++;
-            }
-        } else {
-            printf("Erreur de lecture de la ligne %d\n", i + 1);
-            exit(EXIT_FAILURE);
-        }
-    }
-}
- */
 
 void read_file(FILE *file, int nb_lines, int nb_values_per_line, double* texte) {
     if (file == NULL) {
@@ -272,30 +240,30 @@ void import_model(Model_t* model) {
     
 }
 
-// Fonction d'allocation de la mémoire pour chaque couche
-void Alloc_memory_datas(Model_t *Neural_net)
+void Alloc_memory_datas(Couche_t *couche_in)
 {
-  for (int layer=0; layer<Neural_net->nb_couche; layer++)
-  {
-  Neural_net->couches[layer].data = (double***)malloc(Neural_net->couches[layer].nb_neurons * sizeof(double**));
-  for (int i = 0; i < Neural_net->couches[layer].nb_neurons; ++i)
+  couche_in->data = (double***)malloc(couche_in->nb_neurons * sizeof(double**));
+  for (int i = 0; i < couche_in->nb_neurons; ++i)
     {
-      Neural_net->couches[layer].data[i] = (double**)malloc(Neural_net->couches[layer].lines * sizeof(double*));
-      for (int j = 0; j < Neural_net->couches[layer].lines; ++j)
+      couche_in->data[i] = (double**)malloc(couche_in->lines * sizeof(double*));
+      for (int j = 0; j < couche_in->lines; ++j)
       {
-          Neural_net->couches[layer].data[i][j] = (double*)malloc(Neural_net->couches[layer].columns * sizeof(double));
+          couche_in->data[i][j] = (double*)malloc(couche_in->columns * sizeof(double));
       }
     }
-  }
 }
 
-// Fonction de libération de la mémoire pour chaque couche
-void Free_memory_datas(Model_t *Neural_net)
+void Free_memory_datas(Couche_t *couche_in)
 {
-  for (int layer=0; layer<Neural_net->nb_couche; layer++) 
+  for (int i = 0; i < couche_in->nb_neurons; ++i)
   {
-    free(Neural_net->couches[layer].data);
+    for (int j = 0; j < couche_in->lines; ++j)
+    {
+        free(couche_in->data[i][j]); // Libère chaque colonne
+    }
+    free(couche_in->data[i]); // Libère chaque ligne après que toutes ses colonnes aient été libérées
   }
+  free(couche_in->data);
 }
 
 void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
@@ -313,7 +281,7 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
             {
                 //printf("ligne %d Colonne %d\n", line, column);
                 // Pour chaque neurone d'entrée
-                double value_out = 0;
+                double value_out = 0.0;
                 for (int neuron_in=0; neuron_in<couche_in->nb_neurons; neuron_in++)
                 {
                     // double value_out = 0;
@@ -351,57 +319,6 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
             }
         }
     }
-}
-
-void debug_couche1(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas) {
-    // FILE *inter_file;
-
-    // int nb_lines = 0;
-
-    // inter_file = fopen("../Parametres/inter1.txt", "r");
-
-    // if (inter_file == NULL) {
-    //     perror("Erreur d'ouverture du fichier");
-    //     return;
-    // }
-
-    // nb_lines = calcul_nb_line(inter_file);
-
-    // if (nb_lines == 0) {
-    //     printf("Void file\n");
-    //     return;
-    // }
-    // else
-    // {
-    //     printf("Number of lines : %d\n", nb_lines);
-    // }
-
-    // double* inter_value = (double *)malloc(nb_lines * sizeof(double));
-
-    // read_file(inter_file, nb_lines, inter_value);
-
-    // // printf("Matrix of inter value:\n");
-    // // print_float_matrix(nb_lines, inter_value);
-
-    // int nb_cases = 0;
-    // int res = 0;
-    // for (int neuron=0; neuron<32; neuron++)
-    // {
-    //     for (int ligne=0; ligne<26; ligne++)
-    //     {
-    //         for (int colonne=0; colonne<26; colonne++)
-    //         {
-    //         printf("Result neuron %d, case %d : %.20f\n", neuron, ligne+colonne, Conv2D_1_datas[neuron][ligne][colonne]);
-    //         nb_cases++;
-    //         }
-    //     }
-    // }
-    // printf("Results : %d/%d\n", res, nb_cases);
-        
-
-    // // Check();
-
-    // fclose(inter_file);
 }
 
 void MaxPooling2D(Couche_t* couche_in, Couche_t* couche_out)
