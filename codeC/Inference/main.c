@@ -49,8 +49,6 @@ int main(int argc, char* argv[]){
     strcat(path, argv[1]);
   }
 
-
-
   // Ouverture du fichier image traitée
   BMP bitmap;
   FILE* pFichier=NULL;
