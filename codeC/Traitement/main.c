@@ -41,8 +41,8 @@ int main(int argc, const char * argv[]) {
        char buffer[200];
        strcpy(nomFichierSource,"");
        strcpy(nomFichierCible,"");
-       strcpy(nomFichierSource,"../../Database/Prof/Images/bmp/");
-       strcpy(nomFichierCible,"../../Database/Prof/Images/bmpProcessed/");
+       strcpy(nomFichierSource,"../Database/Prof/bmp/");
+       strcpy(nomFichierCible,"../Database/Prof/bmpProcessed/");
 
        if (argc>3) {
          printf("Probleme dans le nombre d'arguments\n");
