@@ -16,6 +16,28 @@ Pour exécuter, tapez : /
 
 #include <math.h>
 
+void pause()
+{
+    char chaine[2];
+    printf("Appuyez sur Entrée pour continuer\n");
+    fgets(chaine, 2, stdin);
+}
+
+int is_file_auth(char *argv1)
+{
+    int nb_of_valid_files = 11;
+    char *files[] = {"0_20.bmp", "1_20.bmp", "2_20.bmp", "3_20.bmp", "4_20.bmp", "5_20.bmp", "6_20.bmp", "7_20.bmp", "8_20.bmp", "9_20.bmp", "camTest.bmp"};
+
+    for(int index=0; index<nb_of_valid_files; index++)
+    {
+        if (!strcmp(files[index], argv1))
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+  
 void print_double_matrix(double* matrix, int taille) {
     for (int i = 0; i < taille; i++) {
         printf("%f\t", matrix[i]);
@@ -64,6 +86,7 @@ int calcul_nb_values_per_line(FILE *file) {
     return values_per_line + 1;
 }
 
+/* 
 void read_file(FILE *file, int nb_lines, int nb_values_per_line, double* texte) {
     if (file == NULL) {
         perror("Erreur d'ouverture du fichier");
@@ -87,6 +110,41 @@ void read_file(FILE *file, int nb_lines, int nb_values_per_line, double* texte) 
             exit(EXIT_FAILURE);
         }
     }
+}
+ */
+
+void read_file(FILE *file, int nb_lines, int nb_values_per_line, double* texte) {
+    if (file == NULL) {
+        perror("Erreur d'ouverture du fichier");
+        return;
+    }
+
+    // Allouer la mémoire dynamiquement pour le buffer
+    int taille_buffer = 50000;
+    char *buffer = (char *)malloc(taille_buffer * sizeof(char));
+    if (buffer == NULL) {
+        perror("Erreur d'allocation de mémoire");
+        return;
+    }
+
+    for (int i = 0; i < nb_lines; i++) {
+        if (fgets(buffer, taille_buffer, file) != NULL) {
+            // Lire les valeurs dans la mémoire allouée
+            char *token = strtok(buffer, " ");
+            int j = 0;
+            while (token != NULL && j < nb_values_per_line) {
+                texte[i * nb_values_per_line + j] = atof(token);
+                token = strtok(NULL, " ");
+                j++;
+            }
+        } else {
+            printf("Erreur de lecture de la ligne %d\n", i + 1);
+            free(buffer); // Libérer la mémoire avant de quitter en cas d'erreur
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    free(buffer); // Libérer la mémoire une fois que nous avons terminé avec le buffer
 }
 
 void import_couche(Couche_t* couche, int i) {
@@ -245,12 +303,8 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
     //Pour chaque neurone à traiter
     for (int neuron = 0; neuron<couche_out->nb_neurons; neuron++)
     {
-        // 3 lignes pour faire un pause en débug. A commenter en opérationnel
-/* 
-        char chaine[2];
-        printf("PAUSE");
-        fgets(chaine, 2, stdin);
- */
+        //pause();    // faire un pause en débug. A commenter en opérationnel
+
         // Pour chaque ligne de la donnée de sortie
         for (int line = 0; line<(couche_out->lines); line++)
         {
@@ -277,9 +331,8 @@ void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
 /*                             printf("poids : %.20f\t", weight);
                             // Affiche les valeurs de la donnée d'entrée
                             printf("%f\t", couche_in->data[neuron_in][line+window_x][column+window_y]);
-                            char chaine[2];
-                            printf("PAUSE");
-                            fgets(chaine, 2, stdin); */
+                            pause();
+                            */
                         }
                         // printf("\n");
                     }

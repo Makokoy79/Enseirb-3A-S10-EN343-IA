@@ -36,16 +36,19 @@ s'affichent systématiquement
 // Début du programme
 int main(int argc, char* argv[]){
 
-  if(argc < 2) {
-      printf("Il faut donner un nom de fichier à traiter\n");
-      printf("Cela doit être de la forme : %s <numero>_20.bmp\n", argv[0]);
-      printf("Par exemple : %s 0_20.bmp pour traiter le fichier avec le chiffre 0\n", argv[0]);
-      return 1;
-  }
-
   char path[20];
   strcpy(path, "../Lecture/");
-  strcat(path, argv[1]);
+  if(argc < 2 || !is_file_auth(argv[1])) {
+      printf("Il faut donner un nom de fichier à traiter valide\n");
+      printf("Cela doit être de la forme : %s <numero>_20.bmp\n", argv[0]);
+      printf("Par exemple : %s 0_20.bmp pour traiter le fichier avec le chiffre 0\n", argv[0]);
+      printf("\nLe programme va continuer à s'exécuter entraitant l'image 0_20.bmp par défaut\n\n");
+      strcat(path, "0_20.bmp");
+      pause();
+  }else{
+    strcat(path, argv[1]);
+  }
+
 
 
   // Ouverture du fichier image traitée
@@ -56,6 +59,7 @@ int main(int argc, char* argv[]){
   if (pFichier==NULL) {
       printf("%s\n", path);
       printf("Erreur dans la lecture du fichier\n");
+      return 1;
   }
 
   LireBitmap(pFichier, &bitmap);  // Récupération de l'image
@@ -213,10 +217,7 @@ int main(int argc, char* argv[]){
   {
     for (int neuron = 0;neuron<Neural_net.couches[1].nb_neurons; neuron++)
     {
-      printf("Neuron n°%d : \n", neuron);
-      char chaine[2];
-      printf("PAUSE");
-      fgets(chaine, 2, stdin);
+      pause();
       for (int line=0; line<Neural_net.couches[1].lines; line++)
       {
         for (int column=0; column<Neural_net.couches[1].columns; column++)
@@ -317,18 +318,25 @@ int main(int argc, char* argv[]){
   printf("Résultats :\n");
   for (int classe=0; classe<Neural_net.couches[6].columns; classe++)
   {
-    printf("Classe %d : %f\t", classe, Neural_net.couches[6].data[0][0][classe]);
+    double score = Neural_net.couches[6].data[0][0][classe]*100;
+    printf("Classe %d : %6.2f%% ", classe, score);
+    for (int etoile=0; etoile<(int)(score); etoile++)
+    {
+      printf("#");
+    }
+    printf("\n");    
     if (classe == 0)
     {
-      max = Neural_net.couches[6].data[0][0][classe];
-    }else if (Neural_net.couches[6].data[0][0][classe] > max){
-      max = Neural_net.couches[6].data[0][0][classe];
+      max = score;
+    }else if (score > max){
+      max = score;
       result = classe;
     }
   }
+  
   printf("\n\n*************************************************************************\n");
   printf("*** Il est écrit %d sur l'image traitée ", result);
-  printf("avec une probabilité de %.2f%% ***\n", max*100);
+  printf("avec une probabilité de %.2f%% ***\n", max);
   printf("*************************************************************************\n");
 
 

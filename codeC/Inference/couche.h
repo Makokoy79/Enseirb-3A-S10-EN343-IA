@@ -55,6 +55,8 @@ typedef struct
     int kernel[2];
 } Maxpool_t;
 
+void pause();
+int is_file_auth(char *argv1);
 void print_double_matrix(double* matrix, int taille);
 int calcul_nb_line(FILE *file);
 int calcul_nb_values_per_line(FILE *file);
