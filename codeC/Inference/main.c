@@ -217,16 +217,16 @@ int main(int argc, char* argv[]){
   {
     for (int neuron = 0;neuron<Neural_net.couches[1].nb_neurons; neuron++)
     {
+      printf("Neurone %d\n", neuron);
       pause();
       for (int line=0; line<Neural_net.couches[1].lines; line++)
       {
         for (int column=0; column<Neural_net.couches[1].columns; column++)
         {
-          printf("%f\t", Neural_net.couches[1].data[neuron][line][column]);
+          printf("%f ", Neural_net.couches[1].data[neuron][line][column]);
         }
-        printf("\n");
-
       }
+      printf("\n");
     }
   }
 
@@ -244,10 +244,10 @@ int main(int argc, char* argv[]){
       {
         for (int column=0; column<Neural_net.couches[2].columns; column++)
         {
-          printf("%f\t", Neural_net.couches[2].data[neuron][line][column]);
+          printf("%f ", Neural_net.couches[2].data[neuron][line][column]);
         }
-        printf("\n");
       }
+      printf("\n");
     }
   }
 
@@ -265,10 +265,10 @@ int main(int argc, char* argv[]){
       {
         for (int column=0; column<Neural_net.couches[3].columns; column++)
         {
-          printf("%f\t", Neural_net.couches[3].data[neuron][line][column]);
+          printf("%f ", Neural_net.couches[3].data[neuron][line][column]);
         }
-        printf("\n");
       }
+      printf("\n");
     }
   }
 
@@ -285,10 +285,10 @@ int main(int argc, char* argv[]){
       {
         for (int column=0; column<Neural_net.couches[4].columns; column++)
         {
-          printf("%f\t", Neural_net.couches[4].data[neuron][line][column]);
+          printf("%f ", Neural_net.couches[4].data[neuron][line][column]);
         }
-        printf("\n");
       }
+      printf("\n");
     }
   }
 
@@ -299,23 +299,26 @@ int main(int argc, char* argv[]){
   {
     for (int donnee=0; donnee<Neural_net.couches[5].columns; donnee++)
     {
-      if (donnee > 0 && donnee%10 == 0)
-      {
-        printf("\n");
-      }
-      printf("%f\t", Neural_net.couches[5].data[0][0][donnee]);
+      printf("%f\n", Neural_net.couches[5].data[0][0][donnee]);
     }
-    printf("\n");
   }
 
   // Dense
   dense(&Neural_net.couches[5], &Neural_net.couches[6]);
   printf("Fin de traitement couche 6 : dense\n\n");
+  if(argc > 2 && !strcmp(argv[2], "couche5"))
+  {
+    printf("Couche 6 : résultats\n");
+    for (int donnee=0; donnee<Neural_net.couches[6].columns; donnee++)
+    {
+      printf("%f\n", Neural_net.couches[6].data[0][0][donnee]);
+    }
+  }
 
   // Calcul du résultat
   double max = 0;
   int result = 0;
-  printf("Résultats :\n");
+  printf("\nRésultats :\n");
   for (int classe=0; classe<Neural_net.couches[6].columns; classe++)
   {
     double score = Neural_net.couches[6].data[0][0][classe]*100;
