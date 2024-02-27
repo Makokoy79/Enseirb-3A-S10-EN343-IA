@@ -13,7 +13,7 @@ Pour exécuter, tapez : /
 
 #include "Bmp2Matrix.h"
 
-#define PARAM_FOLDER "../Parametres/"
+#define PARAM_FOLDER "./Parametres/"
 #define FILE_COUCHE "couche"
 #define FILE_BIAS "biais"
 #define FILE_WEIGHTS "poids"

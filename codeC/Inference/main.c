@@ -37,7 +37,7 @@ s'affichent systématiquement
 int main(int argc, char* argv[]){
 
   char path[20];
-  strcpy(path, "../Lecture/");
+  strcpy(path, "./Lecture/");
   if(argc < 2 || !is_file_auth(argv[1])) {
       printf("Il faut donner un nom de fichier à traiter valide\n");
       printf("Cela doit être de la forme : %s <numero>_20.bmp\n", argv[0]);

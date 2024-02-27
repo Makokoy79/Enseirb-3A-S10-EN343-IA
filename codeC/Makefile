@@ -9,14 +9,14 @@ inference:
 	$(MAKE) -C Inference
 
 main:
-	gcc main.c -o launcher
+	gcc main.c -o all
 
 clean:
 	$(MAKE) -C Traitement clean
 	$(MAKE) -C Inference clean
-	rm -f launcher
+	rm -f all
 
 veryclean:
 	$(MAKE) -C Traitement veryclean
 	$(MAKE) -C Inference veryclean
-	rm -f launcher *~ *.o
+	rm -f all *~ *.o
