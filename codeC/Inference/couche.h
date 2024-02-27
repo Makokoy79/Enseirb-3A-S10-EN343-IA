@@ -61,6 +61,8 @@ int calcul_nb_values_per_line(FILE *file);
 void read_file(FILE *file, int nb_lines, int nb_values_per_line, double* texte);
 void import_couche(Couche_t* couche, int i);
 void import_model(Model_t* model);
+void Alloc_memory_datas(Model_t *Neural_net);
+void Free_memory_datas(Model_t *Neural_net);
 
 // void Conv2D(BMP* pBitmap, Conv2D_t* Conv2D_shape, Couche_t* couche, double*** Conv2D_1_datas);
 void Conv2D(Couche_t* couche_in, Couche_t* couche_out);

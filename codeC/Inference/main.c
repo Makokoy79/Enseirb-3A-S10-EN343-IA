@@ -21,7 +21,7 @@ Pour exécuter, tapez : ./all <chiffre>_20.bmp
   couche3 : 2ème convolution
   couche4 : 2ème max pooling
   couche5 : flatten
-  
+
   Pas la peine d'argument pour la couche6, les résultats
 s'affichent systématiquement
 ********************************************************/
@@ -32,32 +32,6 @@ s'affichent systématiquement
 
 #include "Bmp2Matrix.h"
 #include "couche.h"
-
-// Fonction d'allocation de la mémoire pour chaque couche
-void Alloc_memory_datas(Model_t *Neural_net)
-{
-  for (int layer=0; layer<Neural_net->nb_couche; layer++)
-  {
-  Neural_net->couches[layer].data = (double***)malloc(Neural_net->couches[layer].nb_neurons * sizeof(double**));
-  for (int i = 0; i < Neural_net->couches[layer].nb_neurons; ++i)
-    {
-      Neural_net->couches[layer].data[i] = (double**)malloc(Neural_net->couches[layer].lines * sizeof(double*));
-      for (int j = 0; j < Neural_net->couches[layer].lines; ++j)
-      {
-          Neural_net->couches[layer].data[i][j] = (double*)malloc(Neural_net->couches[layer].columns * sizeof(double));
-      }
-    }
-  }
-}
-
-// Fonction de libération de la mémoire pour chaque couche
-void Free_memory_datas(Model_t *Neural_net)
-{
-  for (int layer=0; layer<Neural_net->nb_couche; layer++) 
-  {
-    free(Neural_net->couches[layer].data);
-  }
-}
 
 // Début du programme
 int main(int argc, char* argv[]){

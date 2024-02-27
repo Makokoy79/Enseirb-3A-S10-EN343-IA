@@ -214,6 +214,32 @@ void import_model(Model_t* model) {
     
 }
 
+// Fonction d'allocation de la mémoire pour chaque couche
+void Alloc_memory_datas(Model_t *Neural_net)
+{
+  for (int layer=0; layer<Neural_net->nb_couche; layer++)
+  {
+  Neural_net->couches[layer].data = (double***)malloc(Neural_net->couches[layer].nb_neurons * sizeof(double**));
+  for (int i = 0; i < Neural_net->couches[layer].nb_neurons; ++i)
+    {
+      Neural_net->couches[layer].data[i] = (double**)malloc(Neural_net->couches[layer].lines * sizeof(double*));
+      for (int j = 0; j < Neural_net->couches[layer].lines; ++j)
+      {
+          Neural_net->couches[layer].data[i][j] = (double*)malloc(Neural_net->couches[layer].columns * sizeof(double));
+      }
+    }
+  }
+}
+
+// Fonction de libération de la mémoire pour chaque couche
+void Free_memory_datas(Model_t *Neural_net)
+{
+  for (int layer=0; layer<Neural_net->nb_couche; layer++) 
+  {
+    free(Neural_net->couches[layer].data);
+  }
+}
+
 void Conv2D(Couche_t* couche_in, Couche_t* couche_out) {
     int kernel_size = couche_out->kernel[0]*couche_out->kernel[1];
     //Pour chaque neurone à traiter
