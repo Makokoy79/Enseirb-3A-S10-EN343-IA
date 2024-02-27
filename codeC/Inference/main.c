@@ -326,7 +326,7 @@ int main(int argc, char* argv[]){
     printf("Couche 6 : résultats\n");
     for (int donnee=0; donnee<Neural_net.couches[6].columns; donnee++)
     {
-      printf("%f\n", Neural_net.couches[6].data[0][0][donnee]);
+      printf("%.10f\n", Neural_net.couches[6].data[0][0][donnee]);
     }
   }
 
@@ -361,7 +361,8 @@ int main(int argc, char* argv[]){
   printf("avec une probabilité de %.2f%% ***\n", max);
   printf("*************************************************************************\n");
 
-  Free_memory_datas(&Neural_net.couches[6]); // Libère mémoire pour la couche 6
+  Free_memory_datas(&Neural_net.couches[6]);  // Libère mémoire pour la couche 6
+  free(Neural_net.couches);                   // Libère mémoire réseau
 
   return 0;
 }
