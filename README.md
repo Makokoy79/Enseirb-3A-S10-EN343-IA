@@ -20,7 +20,7 @@ Le projet est composé de 2 dossiers principaux :
 A la racine se trouvent aussi le fichier main.c permettant d'afficher le menu général de l'application, et un fichier Makefile facilitant la compilation de l'ensemble des fichiers. 
 
 ## Compilation
-Avant toute chose, il faut se situer à la **racine du répertoire** de projet. Deux commandes principales sont à exécuter :
+Avant toute chose, il faut se situer à la **racine du répertoire** de projet (répertoire ./codeC/). Deux commandes principales sont à exécuter :
 * pour tout supprimer d'une éventuelle précédente compilation et être sûr que nous redémarrons sur des bases saines :
 
        make veryclean
