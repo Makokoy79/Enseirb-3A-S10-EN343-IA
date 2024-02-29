@@ -101,7 +101,7 @@ int main() {
             }
             break;
         case 3: // Tout
-            strcpy(commande, "./Traitement/all photo traitement && ./Inference/all 0_20.bmp");
+            strcpy(commande, "./Traitement/all photo traitement && ./Inference/all ../Database/Bruzat/bmpProcessed/camTest.bmp auto");
             break;
         default:
             printf("Choix invalide.\n");

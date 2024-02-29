@@ -36,8 +36,9 @@ s'affichent systématiquement
 // Début du programme
 int main(int argc, char* argv[]){
 
-  char path[20];
-  strcpy(path, "./Lecture/");
+  char path[70];
+  strcpy(path, "");
+
   if(argc < 2 || !is_file_auth(argv[1])) {
       printf("Il faut donner un nom de fichier à traiter valide\n");
       printf("Cela doit être de la forme : %s <numero>_20.bmp\n", argv[0]);
@@ -45,7 +46,10 @@ int main(int argc, char* argv[]){
       printf("\nLe programme va continuer à s'exécuter entraitant l'image 0_20.bmp par défaut\n\n");
       strcat(path, "0_20.bmp");
       pause();
+  }else if (argc>2 && (!strcmp(argv[2],"auto"))){
+    strcpy(path, argv[1]);
   }else{
+    strcpy(path, "./Lecture/");
     strcat(path, argv[1]);
   }
 

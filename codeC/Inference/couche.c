@@ -26,7 +26,7 @@ void pause()
 int is_file_auth(char *argv1)
 {
     int nb_of_valid_files = 11;
-    char *files[] = {"0_20.bmp", "1_20.bmp", "2_20.bmp", "3_20.bmp", "4_20.bmp", "5_20.bmp", "6_20.bmp", "7_20.bmp", "8_20.bmp", "9_20.bmp", "camTest.bmp"};
+    char *files[] = {"0_20.bmp", "1_20.bmp", "2_20.bmp", "3_20.bmp", "4_20.bmp", "5_20.bmp", "6_20.bmp", "7_20.bmp", "8_20.bmp", "9_20.bmp", "../Database/Bruzat/bmpProcessed/camTest.bmp"};
 
     for(int index=0; index<nb_of_valid_files; index++)
     {
