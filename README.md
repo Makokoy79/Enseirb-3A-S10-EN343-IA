@@ -72,8 +72,22 @@ Si non, alors le programe s'exécute normalement. Si oui alors un dernier choix 
 Un seul choix parmis les 6 est possible. Ensuite le programme d'Inférence finit par s'exécuter.
 
 ### Menu 3 : Tout
-Avec ce denrier choix le programme va automatiquement :
+
+#### Principe
+Avec ce dernier choix le programme va automatiquement :
 * Prendre une photo
 * La traiter
 * Réaliser l'opération d'inférence
 * Donner le résultat de prédiction avec le score associé
+
+ #### Fonctionnement
+ Dès la validation du choix, la caméra s'active et l'image apparait (si le raspberry pi est connecté à un écran bien sûr).Cela permet pendant quelques secondes de bien positionner le chiffre manuscrit au centre de l'image. Le traitement et l'inférence fonctionnent mieux si le fond est noir et le caractère clair.
+
+ Une fois le temps écoulé la photo est prise et stockée dans le répertoire ../Database/Bruzat/bmp.
+
+ Ensuite l'image est rognée, seuillée puis le résultat sauvé dans le répertoire ../Database/Bruzat/bmpProcessed.
+
+ La dernière étape, l'inférence, est alors excécutée avec en paramètre le chemin vers l'image traitée.
+
+ Comme pour le choix 2-1-0, le programme affiche le score pour chacune des classes et la classe ayant obtenu le plus grand score.
+
