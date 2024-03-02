@@ -18,4 +18,5 @@ Pour exécuter, tapez : /
 void RognerBitmapMax(BMP* pBitmap,unsigned char valMax);
 void RognerBitmapMin(BMP* pBitmap,  unsigned char valMin);
 void TraitementDonnees(BMP* pBitmap, char* nomFichierSource, char* nomFichierCible, int chiffreDebut, int chiffreFin, int quantiteDebut,int quantiteFin,unsigned char valeurSeuil, int maxOuMin, int masque,int tailleLargeurImageTraite,int tailleHauteurImageTraite);
+void MasqueBitmap(BMP* pBitmap, unsigned char val);
 #endif

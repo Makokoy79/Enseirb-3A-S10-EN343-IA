@@ -50,6 +50,8 @@ void import_couche(Couche_t* couche, int i);
 void import_model(Model_t* model);
 void Alloc_memory_datas(Couche_t* couche_in);
 void Free_memory_datas(Couche_t *couche_in);
+void saveLayerOutput(Couche_t *couche, int coucheIndex);
+
 
 void Conv2D(Couche_t* couche_in, Couche_t* couche_out);
 

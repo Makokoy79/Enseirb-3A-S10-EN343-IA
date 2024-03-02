@@ -27,10 +27,6 @@ int main(int argc, const char * argv[]) {
        char command[200];
        char nomFichierSource[200];
        char nomFichierCible[200];
-       int chiffreDebut=0;
-       int chiffreFin=9;
-       int quantiteDebut=0;
-       int quantiteFin=20;
        unsigned char valeurSeuil=100;
        int maxOuMin=1;
        int masque=0;

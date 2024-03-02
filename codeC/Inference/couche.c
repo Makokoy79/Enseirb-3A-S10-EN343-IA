@@ -397,3 +397,31 @@ void dense(Couche_t* couche_in, Couche_t* couche_out)
         //printf("Résultat classe %d : %f\n", classe, couche_out->data[0][0][classe]);
     }
 }
+
+void saveLayerOutput(Couche_t *couche, int coucheIndex) {
+    char fileName[30];
+    sprintf(fileName, "inter%d-C.txt", coucheIndex);
+    FILE *file = fopen(fileName, "w");
+    if (!file)
+    {
+        printf("Erreur à la création du fichier %s\n", fileName);
+        return;
+    }
+    for (int neuron = 0; neuron < couche->nb_neurons; neuron++)
+    {
+        for (int line = 0; line < couche->lines; line++)
+        {
+            for (int column = 0; column < couche->columns; column++)
+            {
+                fprintf(file, "%f ", couche->data[neuron][line][column]);
+                if(coucheIndex > 4)
+                {
+                    fprintf(file, "\n");
+                }
+            }
+        }
+        if(coucheIndex <= 4)
+            fprintf(file, "\n");
+    }
+    fclose(file);
+}
